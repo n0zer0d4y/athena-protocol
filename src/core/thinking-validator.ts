@@ -567,9 +567,12 @@ export class ThinkingValidator {
     let filesAnalyzed = 0;
     const toolsUsed: string[] = [];
 
-    // Analyze key files
+    // Analyze key files using grep-first workflow
     if (filesToAnalyze && filesToAnalyze.length > 0) {
       analysis.push("## Key Files Analysis");
+      analysis.push(
+        "*(Analysis performed using grep-first workflow for efficiency)*"
+      );
 
       for (const filePath of filesToAnalyze) {
         try {
@@ -577,25 +580,92 @@ export class ThinkingValidator {
             ? join(workingDirectory, filePath)
             : join(projectRoot, filePath);
 
+          analysis.push(`### ${filePath}`);
+
+          // GREP-FIRST: Search for key patterns to understand file structure
+          const grepPatterns = [
+            "function|const|class|export|import",
+            "component|Component|render|return",
+            "error|catch|try|throw",
+            "async|await|promise|Promise",
+          ];
+
+          let fileContent = "";
+          let grepResults: string[] = [];
+
+          for (const pattern of grepPatterns) {
+            try {
+              const grepResult = await this.toolCallingService.grep(
+                pattern,
+                fullPath
+              );
+              if (grepResult.success && grepResult.matches) {
+                grepResults.push(
+                  `${pattern}: ${grepResult.matches.length} matches`
+                );
+                // Add a few key matches to analysis
+                const keyMatches = grepResult.matches
+                  .slice(0, 3)
+                  .map((m) => `Line ${m.line}: ${m.content}`);
+                if (keyMatches.length > 0) {
+                  grepResults.push(...keyMatches);
+                }
+              }
+            } catch (error) {
+              // Continue with other patterns
+            }
+          }
+
+          if (grepResults.length > 0) {
+            analysis.push("**Key Patterns Found:**");
+            analysis.push("```");
+            analysis.push(grepResults.join("\n"));
+            analysis.push("```");
+            toolsUsed.push("grep");
+          }
+
+          // TARGETED READ: Read specific sections based on grep findings
           const result = await this.toolCallingService.readFile(fullPath);
           toolsUsed.push("readFile");
           if (result.success && result.content) {
             filesAnalyzed++;
-            analysis.push(`### ${filePath}`);
+            const lines = result.content.split("\n");
+
+            // Read first 50 lines (imports/exports/setup)
+            analysis.push("**File Content (first 50 lines):**");
             analysis.push("```");
-            // Limit content to first 100 lines to avoid token overflow
-            const lines = result.content.split("\n").slice(0, 100);
-            analysis.push(lines.join("\n"));
-            if (result.content.split("\n").length > 100) {
-              analysis.push("... (truncated)");
+            analysis.push(lines.slice(0, 50).join("\n"));
+            analysis.push("```");
+
+            // If file is larger, show targeted sections around key patterns
+            if (lines.length > 100) {
+              // Try to find main function/component definitions
+              const mainFunctionStart = lines.findIndex((line) =>
+                /^\s*(function|const|class|export)/.test(line)
+              );
+
+              if (mainFunctionStart >= 0) {
+                const endLine = Math.min(mainFunctionStart + 30, lines.length);
+                analysis.push(
+                  `**Main Implementation (lines ${
+                    mainFunctionStart + 1
+                  }-${endLine}):**`
+                );
+                analysis.push("```");
+                analysis.push(
+                  lines.slice(mainFunctionStart, endLine).join("\n")
+                );
+                analysis.push("```");
+              }
+
+              analysis.push(
+                `*(File has ${lines.length} total lines, showing targeted sections)*`
+              );
             }
-            analysis.push("```");
           } else {
-            analysis.push(`### ${filePath}`);
             analysis.push(`Failed to read file: ${result.error}`);
           }
         } catch (error) {
-          analysis.push(`### ${filePath}`);
           analysis.push(`Error analyzing file: ${(error as Error).message}`);
         }
       }

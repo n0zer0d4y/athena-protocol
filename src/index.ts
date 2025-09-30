@@ -209,7 +209,7 @@ Focused Outputs:
             type: "array",
             items: { type: "string" },
             description:
-              "Array of file paths to analyze (relative to project root)",
+              "Array of absolute file paths to analyze (must be full paths, not relative)",
           },
           workingDirectory: {
             type: "string",
@@ -342,7 +342,7 @@ Focused Outputs:
             type: "array",
             items: { type: "string" },
             description:
-              "Array of file paths to analyze (relative to project root)",
+              "Array of absolute file paths to analyze (must be full paths, not relative)",
           },
           workingDirectory: {
             type: "string",
@@ -446,7 +446,7 @@ Focused Outputs:
             type: "array",
             items: { type: "string" },
             description:
-              "Array of file paths to analyze (relative to project root)",
+              "Array of absolute file paths to analyze (must be full paths, not relative)",
           },
           workingDirectory: {
             type: "string",
@@ -553,7 +553,7 @@ Focused Outputs:
             type: "array",
             items: { type: "string" },
             description:
-              "Array of file paths to analyze (relative to project root)",
+              "Array of absolute file paths to analyze (must be full paths, not relative)",
           },
           workingDirectory: {
             type: "string",
@@ -649,7 +649,7 @@ Focused Outputs:
             type: "array",
             items: { type: "string" },
             description:
-              "Array of file paths to analyze (relative to project root)",
+              "Array of absolute file paths to analyze (must be full paths, not relative)",
           },
           workingDirectory: {
             type: "string",
@@ -1143,9 +1143,7 @@ async function main() {
   console.log(
     `  Read File: ${toolCallingConfig.readFile.enabled ? "✅" : "❌"}`
   );
-  console.log(
-    `  Search Files: ${toolCallingConfig.searchFiles.enabled ? "✅" : "❌"}`
-  );
+  console.log(`  Grep: ${toolCallingConfig.grep.enabled ? "✅" : "❌"}`);
   console.log(
     `  List Files: ${toolCallingConfig.listFiles.enabled ? "✅" : "❌"}`
   );

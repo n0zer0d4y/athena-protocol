@@ -2386,8 +2386,8 @@ export function loadToolCallingConfig(): ToolCallingConfig {
     readFile: {
       enabled: process.env.TOOL_CALLING_READ_FILE_ENABLED !== "false", // Default to enabled
     },
-    searchFiles: {
-      enabled: process.env.TOOL_CALLING_SEARCH_FILES_ENABLED !== "false", // Default to enabled
+    grep: {
+      enabled: process.env.TOOL_CALLING_GREP_ENABLED !== "false", // Default to enabled
     },
     listFiles: {
       enabled: process.env.TOOL_CALLING_LIST_FILES_ENABLED !== "false", // Default to enabled
@@ -2442,8 +2442,8 @@ export function validateToolCallingConfig(config: ToolCallingConfig): {
   if (typeof config.readFile?.enabled !== "boolean") {
     errors.push("readFile.enabled must be a boolean");
   }
-  if (typeof config.searchFiles?.enabled !== "boolean") {
-    errors.push("searchFiles.enabled must be a boolean");
+  if (typeof config.grep?.enabled !== "boolean") {
+    errors.push("grep.enabled must be a boolean");
   }
   if (typeof config.listFiles?.enabled !== "boolean") {
     errors.push("listFiles.enabled must be a boolean");

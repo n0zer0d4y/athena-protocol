@@ -21,21 +21,26 @@ async function testThinkingValidation() {
   let serverReady = false;
   let serverOutput = "";
 
-  // Listen for server ready signal
-  serverProcess.stdout.on("data", (data) => {
+  // Listen for server ready signal (check both stdout and stderr)
+  const checkForReady = (data) => {
     const output = data.toString();
     serverOutput += output;
-    console.log("📡 Server output:", output.trim());
 
     if (output.includes("Athena Protocol - Ready!") && !serverReady) {
       serverReady = true;
       console.log("✅ MCP server is ready!\n");
       runThinkingValidationTest();
     }
+  };
+
+  serverProcess.stdout.on("data", (data) => {
+    console.log("📡 Server stdout:", data.toString().trim());
+    checkForReady(data);
   });
 
   serverProcess.stderr.on("data", (data) => {
     console.log("⚠️  Server stderr:", data.toString().trim());
+    checkForReady(data);
   });
 
   serverProcess.on("error", (error) => {
@@ -53,13 +58,73 @@ async function testThinkingValidation() {
     }
   }, 5000);
 
+  // Helper function to send MCP requests
+  async function sendMCPRequest(request) {
+    return new Promise((resolve, reject) => {
+      const requestJson = JSON.stringify(request) + "\n";
+      console.log(`📤 Sending ${request.method} request...`);
+
+      serverProcess.stdin.write(requestJson);
+
+      let responseData = "";
+      const responseHandler = (data) => {
+        const chunk = data.toString();
+        responseData += chunk;
+
+        // Try to parse complete JSON response
+        try {
+          const response = JSON.parse(responseData.trim());
+          if (response.id === request.id) {
+            serverProcess.stdout.removeListener("data", responseHandler);
+            resolve(response);
+          }
+        } catch (e) {
+          // Continue collecting data
+        }
+      };
+
+      serverProcess.stdout.on("data", responseHandler);
+
+      // Timeout after 10 seconds
+      setTimeout(() => {
+        serverProcess.stdout.removeListener("data", responseHandler);
+        reject(new Error(`Timeout waiting for response to ${request.method}`));
+      }, 10000);
+    });
+  }
+
   async function runThinkingValidationTest() {
+    console.log("🔧 Initializing MCP connection...");
+
+    // First, send initialize request (required for MCP protocol)
+    const initRequest = {
+      jsonrpc: "2.0",
+      id: 1,
+      method: "initialize",
+      params: {
+        protocolVersion: "2024-11-05",
+        capabilities: {},
+        clientInfo: {
+          name: "test-client",
+          version: "1.0.0",
+        },
+      },
+    };
+
+    console.log("📤 Sending initialize request...");
+    const initResponse = await sendMCPRequest(initRequest);
+    console.log("📥 Initialize response:", initResponse);
+
+    if (!initResponse || initResponse.error) {
+      throw new Error("Failed to initialize MCP connection");
+    }
+
     console.log("🧠 Testing thinking_validation tool...");
 
     // Create MCP client test
     const testRequest = {
       jsonrpc: "2.0",
-      id: 1,
+      id: 2,
       method: "tools/call",
       params: {
         name: "thinking_validation",

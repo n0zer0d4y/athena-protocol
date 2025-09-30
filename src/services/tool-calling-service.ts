@@ -11,7 +11,7 @@ const execAsync = promisify(exec);
 
 export interface ToolCallingConfig {
   readFile: { enabled: boolean };
-  searchFiles: { enabled: boolean };
+  grep: { enabled: boolean };
   listFiles: { enabled: boolean };
   writeToFile: { enabled: boolean };
   replaceInFile: { enabled: boolean };
@@ -121,26 +121,28 @@ export class ToolCallingService {
     }
   }
 
-  async searchFiles(
+  async grep(
     pattern: string,
-    directoryPath: string
+    path: string,
+    options?: { recursive?: boolean; caseSensitive?: boolean }
   ): Promise<{
     success: boolean;
     matches?: Array<{ file: string; line: number; content: string }>;
     error?: string;
   }> {
-    if (!this.config.searchFiles.enabled) {
+    if (!this.config.grep.enabled) {
       return {
         success: false,
-        error: "File searching is disabled in configuration",
+        error: "Grep searching is disabled in configuration",
       };
     }
 
     try {
       const result = await this.toolRegistry.grep({
         pattern,
-        path: directoryPath,
-        recursive: true,
+        path,
+        recursive: options?.recursive ?? true,
+        caseSensitive: options?.caseSensitive ?? false,
       });
       return {
         success: result.success,
@@ -148,10 +150,10 @@ export class ToolCallingService {
         error: result.error,
       };
     } catch (error) {
-      logger.error(`Error searching files in ${directoryPath}:`, error);
+      logger.error(`Error running grep in ${path}:`, error);
       return {
         success: false,
-        error: `Failed to search files: ${(error as Error).message}`,
+        error: `Grep failed: ${(error as Error).message}`,
       };
     }
   }
