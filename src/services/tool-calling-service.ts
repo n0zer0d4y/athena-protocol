@@ -16,6 +16,17 @@ export interface ToolCallingConfig {
   writeToFile: { enabled: boolean };
   replaceInFile: { enabled: boolean };
   executeCommand: { enabled: boolean };
+  // Security restrictions
+  maxFileSizeKB: number;
+  maxExecutionTimeSec: number;
+  allowedFileExtensions: string[];
+  allowedCommands: string[];
+  // Tool-specific timeouts (in milliseconds)
+  timeoutThinkingValidationMs: number;
+  timeoutImpactAnalysisMs: number;
+  timeoutAssumptionCheckerMs: number;
+  timeoutDependencyMapperMs: number;
+  timeoutThinkingOptimizerMs: number;
 }
 
 export class ToolCallingService {
@@ -37,8 +48,35 @@ export class ToolCallingService {
       };
     }
 
+    // Validate file extension
+    const fileExt = this.getFileExtension(filePath);
+    if (!this.config.allowedFileExtensions.includes(fileExt)) {
+      return {
+        success: false,
+        error: `File extension '${fileExt}' is not allowed. Allowed extensions: ${this.config.allowedFileExtensions.join(
+          ", "
+        )}`,
+      };
+    }
+
     try {
       const result = await this.toolRegistry.readFile({ path: filePath });
+
+      // Check file size limit if content was successfully read
+      if (result.success && result.content) {
+        const fileSizeKB = Buffer.byteLength(result.content, "utf8") / 1024;
+        if (fileSizeKB > this.config.maxFileSizeKB) {
+          return {
+            success: false,
+            error: `File size (${fileSizeKB.toFixed(
+              1
+            )}KB) exceeds maximum allowed size (${
+              this.config.maxFileSizeKB
+            }KB)`,
+          };
+        }
+      }
+
       return {
         success: result.success,
         content: result.content,
@@ -161,9 +199,29 @@ export class ToolCallingService {
       };
     }
 
+    // Validate command against allowed commands list
+    const isAllowed = this.config.allowedCommands.some((allowedCmd) =>
+      command.startsWith(allowedCmd)
+    );
+
+    if (!isAllowed) {
+      return {
+        success: false,
+        error: `Command not allowed: "${command}". Allowed commands start with: ${this.config.allowedCommands
+          .slice(0, 10)
+          .join(", ")}${this.config.allowedCommands.length > 10 ? "..." : ""}`,
+      };
+    }
+
     try {
       const cwd = workingDirectory ? resolve(workingDirectory) : process.cwd();
-      const result = await execAsync(command, { cwd, timeout: 30000 }); // 30 second timeout
+      const timeoutMs = this.config.maxExecutionTimeSec * 1000; // Convert to milliseconds
+
+      const result = await execAsync(command, {
+        cwd,
+        timeout: timeoutMs,
+        maxBuffer: 1024 * 1024, // 1MB buffer
+      });
 
       return {
         success: true,
@@ -207,6 +265,40 @@ export class ToolCallingService {
           "File replacement is disabled in configuration for security reasons",
       };
     }
-    return { success: false, error: "File replacement not implemented" };
+
+    // Validate file extension
+    const fileExt = this.getFileExtension(filePath);
+    if (!this.config.allowedFileExtensions.includes(fileExt)) {
+      return {
+        success: false,
+        error: `File extension '${fileExt}' is not allowed for replacement. Allowed extensions: ${this.config.allowedFileExtensions.join(
+          ", "
+        )}`,
+      };
+    }
+
+    try {
+      const result = await this.toolRegistry.replaceInFile({
+        path: filePath,
+        oldString,
+        newString,
+      });
+      return {
+        success: result.success,
+        error: result.error,
+      };
+    } catch (error) {
+      logger.error(`Error replacing in file ${filePath}:`, error);
+      return {
+        success: false,
+        error: `Failed to replace in file: ${(error as Error).message}`,
+      };
+    }
+  }
+
+  // Helper method to get file extension
+  private getFileExtension(filePath: string): string {
+    const ext = filePath.split(".").pop()?.toLowerCase() || "";
+    return ext ? `.${ext}` : "";
   }
 }

@@ -66,11 +66,11 @@ ANTHROPIC_API_KEY=your_anthropic_api_key_here
 
 # OpenAI GPT (Supports GPT-4, GPT-4o, GPT-5)  
 # Registration: https://platform.openai.com/api-keys
-OPENAI_API_KEY=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
+OPENAI_API_KEY=your_openai_api_key_here
 
 # Google Gemini (Fast and cost-effective)
 # Registration: https://makersuite.google.com/app/apikey  
-GOOGLE_API_KEY=AIzaSyC93jHBRyaxRraShekPil7d1VuhCYfVKpw
+GOOGLE_API_KEY=your_google_api_key_here
 
 # ==========================================
 # 🔐 API KEYS - SECONDARY PROVIDERS
@@ -78,7 +78,7 @@ GOOGLE_API_KEY=AIzaSyC93jHBRyaxRraShekPil7d1VuhCYfVKpw
 
 # Groq (Ultra-fast inference)
 # Registration: https://console.groq.com/keys
-GROQ_API_KEY=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
+GROQ_API_KEY=your_groq_api_key_here
 
 # xAI Grok (Elon Musk's AI)
 # Registration: https://x.ai/api
@@ -86,7 +86,7 @@ XAI_API_KEY=your_xai_api_key_here
 
 # OpenRouter (Multi-model access)
 # Registration: https://openrouter.ai/keys
-OPENROUTER_API_KEY=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
+OPENROUTER_API_KEY=your_openrouter_api_key_here
 
 # Perplexity (Research-focused)
 # Registration: https://www.perplexity.ai/settings/api
@@ -94,7 +94,7 @@ PERPLEXITY_API_KEY=your_perplexity_api_key_here
 
 # Mistral AI (Fast, cost-effective French AI)
 # Registration: https://console.mistral.ai/api-keys
-MISTRAL_API_KEY=j29QM7wposCjyRo9SRX501naWMhuRs0E
+MISTRAL_API_KEY=your_mistral_api_key_here
 
 # ==========================================
 # 🔐 API KEYS - SPECIALIZED PROVIDERS  
@@ -106,7 +106,7 @@ OLLAMA_API_KEY=your_ollama_api_key_here
 
 # Z.AI (Chinese AI provider)
 # Registration: https://z.ai/manage-apikey/apikey-list
-ZAI_API_KEY=5c667f26fc874230a73fe5a429c5df05.XyvUgSUrXoeLbUvc
+ZAI_API_KEY=your_zai_api_key_here
 
 # Azure OpenAI (Enterprise)
 # Setup: https://portal.azure.com/
@@ -272,6 +272,94 @@ ENV_CACHE_TTL=30000
 # ANTHROPIC_TEMPERATURE=0.8        # Claude for reasoning
 # OPENAI_MAX_TOKENS=3000          # GPT for code
 # GOOGLE_TEMPERATURE=0.6          # Gemini for analysis
+
+# ==========================================
+# TOOL CALLING CONFIGURATION
+# ==========================================
+# Function/Calling Tools for Enhanced LLM Responses
+# These tools allow the LLM to analyze actual project files during thinking validation
+# ALL TOOLS ARE DISABLED BY DEFAULT FOR SECURITY
+# File Reading Tools (recommended for most use cases - low risk)
+# Enable these for enhanced context gathering and code analysis
+TOOL_CALLING_READ_FILE_ENABLED=true # Read individual file contents
+TOOL_CALLING_SEARCH_FILES_ENABLED=true # Search patterns across files
+TOOL_CALLING_LIST_FILES_ENABLED=true # List directory contents
+
+# File Writing Tools (use with caution - high risk)
+# Only enable if you need the LLM to modify files
+TOOL_CALLING_WRITE_TO_FILE_ENABLED=false # Create or overwrite files
+TOOL_CALLING_REPLACE_IN_FILE_ENABLED=false # Make targeted file edits
+
+# System Tools (highest risk - critical)
+# Only enable for trusted environments with proper security measures
+TOOL_CALLING_EXECUTE_COMMAND_ENABLED=true # Execute terminal commands
+
+# Tool Safety Limits
+TOOL_CALLING_MAX_FILE_SIZE_KB=1024 # Maximum file size for reading (1MB)
+TOOL_CALLING_MAX_EXECUTION_TIME_SEC=300 # Maximum execution time per operation
+TOOL_CALLING_ALLOWED_FILE_EXTENSIONS=.js,.jsx,.ts,.tsx,.mjs,.cjs,.d.ts,.d.tsx,.html,.htm,.xhtml,.css,.scss,.sass,.less,.styl,.vue,.svelte,.astro,.py,.pyc,.pyo,.pyd,.rb,.rbw,.php,.phtml,.java,.class,.cs,.csx,.go,.rs,.swift,.kt,.kts,.json,.jsonc,.yml,.yaml,.xml,.xsd,.toml,.ini,.cfg,.md,.markdown,.txt,.rst,.adoc,.tex,.package.json,.package-lock.json,.yarn.lock,.pnpm-lock.yaml,.requirements.txt,.pipfile,.Pipfile.lock,.Gemfile,.Gemfile.lock,.composer.json,.composer.lock,.pom.xml,.build.gradle,.gradle.kts,.csproj,.fsproj,.vbproj,.Cargo.toml,.Cargo.lock,.go.mod,.go.sum,.webpack,.babelrc,.eslintrc,.prettierrc,.dockerfile,.Dockerfile,.docker-compose.yml,.Makefile,.makefile,.sql,.prisma,.sh,.bash,.zsh,.ps1,.bat,.cmd
+
+# Command Execution Security
+#
+# Whitelist of allowed commands for the execute_command tool.
+# Commands must match exactly from the start of the executed command.
+# Separate multiple commands with commas.
+
+TOOL_CALLING_ALLOWED_COMMANDS=node --version,npm --version,python --version,pip --version,git --version,java -version,mvn --version,gradle --version,docker --version,echo,pwd,ls,dir,type,cat,head,tail,find,grep,wc,du,df,ps,uname,whoami,id,date,uptime,hostname,ping -c 1,ping -n 1,curl --version,wget --version,tar --version,zip --version,unzip -l,gzip --version,bzip2 --version,xz --version,make --version,gcc --version,g++ --version,clang --version,rustc --version,cargo --version,go version,dotnet --version,php --version,composer --version,ruby --version,gem --version,perl --version,sqlite3 --version,mysql --version,psql --version,redis-cli --version,mongo --version,kubectl version,helm version,docker-compose --version,kafka-topics.sh --version,zookeeper-shell.sh,elasticsearch --version,kibana --version,logstash --version
+
+# Reference: Common Safe Commands (add to TOOL_CALLING_ALLOWED_COMMANDS as needed)
+#
+# System Information:
+# node --version # Check Node.js version
+# npm --version # Check npm version
+# python --version # Check Python version
+# git --version # Check Git version
+# which <command> # Find command location
+# where <command> # Windows equivalent of which
+#
+# Directory Operations:
+# pwd # Print working directory
+# ls # List directory contents (Unix/Linux)
+# ls -la # List all files with details
+# dir # List directory contents (Windows)
+# dir /w # Wide directory listing (Windows)
+# find . -name "\*.js" # Find files by pattern
+#
+# File Operations:
+# cat <file> # Display file contents (Unix/Linux)
+# type <file> # Display file contents (Windows)
+# head <file> # Show first 10 lines of file
+# tail <file> # Show last 10 lines of file
+# wc -l <file> # Count lines in file
+#
+# Simple Utilities:
+# echo <text> # Print text to console
+# date # Show current date/time
+# time # Show current time (Windows)
+# whoami # Show current user
+#
+# Development Tools:
+# npm list # List installed npm packages
+# npm outdated # Check for outdated packages
+# git status # Show git repository status
+# git log --oneline -5 # Show recent git commits
+#
+# ⚠️ SECURITY WARNING:
+# Only add commands that are safe for automated execution.
+# Avoid commands that modify files, install software, or access sensitive data.
+# Commands should be informational/read-only operations only.
+
+# Tool-Specific Timeout Configuration (in milliseconds)
+#
+# These control individual tool timeouts to prevent long-running operations
+# from causing MCP client timeouts. Adjust based on your environment and
+# expected file sizes/processing complexity.
+
+TOOL_TIMEOUT_THINKING_VALIDATION_MS=300000  # 5 minutes - Basic validation
+TOOL_TIMEOUT_IMPACT_ANALYSIS_MS=300000      # 5 minutes - File analysis heavy
+TOOL_TIMEOUT_ASSUMPTION_CHECKER_MS=300000   # 5 minutes - Logic validation
+TOOL_TIMEOUT_DEPENDENCY_MAPPER_MS=300000    # 5 minutes - Dependency analysis
+TOOL_TIMEOUT_THINKING_OPTIMIZER_MS=300000   # 5 minutes - Optimization logic
 
 ################################################################################
 # END OF CONFIGURATION

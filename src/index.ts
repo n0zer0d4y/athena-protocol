@@ -57,7 +57,7 @@ import {
   validateToolCallingConfig,
 } from "./config-manager.js";
 import { ThinkingValidator } from "./core/thinking-validator.js";
-import { HEALTH_CHECK_TOOL } from "./tools/simple-health-check.js";
+import { HEALTH_CHECK_TOOL } from "./client-tools/simple-health-check.js";
 import { ToolCallingService } from "./services/tool-calling-service.js";
 import {
   getConfiguredProviders,

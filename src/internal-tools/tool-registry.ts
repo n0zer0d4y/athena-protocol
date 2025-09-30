@@ -4,15 +4,16 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { readFileTool } from './read-file.js';
-import { writeFileTool } from './write-file.js';
-import { listFilesTool } from './list-files.js';
-import { readManyFilesTool } from './read-many-files.js';
-import { globTool } from './glob.js';
-import { grepTool } from './grep.js';
-import { executeShellTool } from './execute-shell.js';
-import { gitOperationTool } from './git-operation.js';
-import { webSearchTool } from './web-search.js';
+import { readFileTool } from "./read-file.js";
+import { writeFileTool } from "./write-file.js";
+import { listFilesTool } from "./list-files.js";
+import { readManyFilesTool } from "./read-many-files.js";
+import { globTool } from "./glob.js";
+import { grepTool } from "./grep.js";
+import { replaceInFileTool } from "./replace-in-file.js";
+import { executeShellTool } from "./execute-shell.js";
+import { gitOperationTool } from "./git-operation.js";
+import { webSearchTool } from "./web-search.js";
 
 export interface ToolRegistry {
   readFile: (args: any) => Promise<any>;
@@ -21,6 +22,7 @@ export interface ToolRegistry {
   readManyFiles: (args: any) => Promise<any>;
   glob: (args: any) => Promise<any>;
   grep: (args: any) => Promise<any>;
+  replaceInFile: (args: any) => Promise<any>;
   executeShell: (args: any) => Promise<any>;
   gitOperation: (args: any) => Promise<any>;
   webSearch: (args: any) => Promise<any>;
@@ -34,6 +36,7 @@ export function createToolRegistry(): ToolRegistry {
     readManyFiles: readManyFilesTool,
     glob: globTool,
     grep: grepTool,
+    replaceInFile: replaceInFileTool,
     executeShell: executeShellTool,
     gitOperation: gitOperationTool,
     webSearch: webSearchTool,

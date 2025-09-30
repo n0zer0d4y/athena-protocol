@@ -1,4 +1,5 @@
 // Configuration Manager with caching and validation
+import { ToolCallingConfig } from "./services/tool-calling-service.js";
 import {
   SUPPORTED_PROVIDERS,
   PROVIDER_API_KEYS,
@@ -9,14 +10,7 @@ import {
 // INTERFACES (moved from llm-config.ts)
 // ==========================================
 
-export interface ToolCallingConfig {
-  readFile: { enabled: boolean };
-  searchFiles: { enabled: boolean };
-  listFiles: { enabled: boolean };
-  writeToFile: { enabled: boolean };
-  replaceInFile: { enabled: boolean };
-  executeCommand: { enabled: boolean };
-}
+// ToolCallingConfig is imported from tool-calling-service.ts
 
 export interface LLMProviderConfig {
   name: string;
@@ -2372,25 +2366,66 @@ export function loadConfig(): AthenaProtocolConfig {
  * Load tool calling configuration from environment variables
  */
 export function loadToolCallingConfig(): ToolCallingConfig {
+  // Parse allowed file extensions from env var
+  const allowedExtensionsStr =
+    process.env.TOOL_CALLING_ALLOWED_FILE_EXTENSIONS ||
+    ".js,.jsx,.ts,.tsx,.mjs,.cjs,.d.ts,.d.tsx,.html,.htm,.xhtml,.css,.scss,.sass,.less,.styl,.vue,.svelte,.astro,.py,.pyc,.pyo,.pyd,.rb,.rbw,.php,.phtml,.java,.class,.cs,.csx,.go,.rs,.swift,.kt,.kts,.json,.jsonc,.yml,.yaml,.xml,.xsd,.toml,.ini,.cfg,.md,.markdown,.txt,.rst,.adoc,.tex,.package.json,.package-lock.json,.yarn.lock,.pnpm-lock.yaml,.requirements.txt,.pipfile,.Pipfile.lock,.Gemfile,.Gemfile.lock,.composer.json,.composer.lock,.pom.xml,.build.gradle,.gradle.kts,.csproj,.fsproj,.vbproj,.Cargo.toml,.Cargo.lock,.go.mod,.go.sum,.webpack,.babelrc,.eslintrc,.prettierrc,.dockerfile,.Dockerfile,.docker-compose.yml,.Makefile,.makefile,.sql,.prisma,.sh,.bash,.zsh,.ps1,.bat,.cmd";
+  const allowedFileExtensions = allowedExtensionsStr
+    .split(",")
+    .map((ext) => ext.trim());
+
+  // Parse allowed commands from env var
+  const allowedCommandsStr =
+    process.env.TOOL_CALLING_ALLOWED_COMMANDS ||
+    "node --version,npm --version,python --version,pip --version,git --version,java -version,mvn --version,gradle --version,docker --version,echo,pwd,ls,dir,type,cat,head,tail,find,grep,wc,du,df,ps,uname,whoami,id,date,uptime,hostname,ping -c 1,ping -n 1,curl --version,wget --version,tar --version,zip --version,unzip -l,gzip --version,bzip2 --version,xz --version,make --version,gcc --version,g++ --version,clang --version,rustc --version,cargo --version,go version,dotnet --version,php --version,composer --version,ruby --version,gem --version,perl --version,sqlite3 --version,mysql --version,psql --version,redis-cli --version,mongo --version,kubectl version,helm version,docker-compose --version,kafka-topics.sh --version,zookeeper-shell.sh,elasticsearch --version,kibana --version,logstash --version";
+  const allowedCommands = allowedCommandsStr
+    .split(",")
+    .map((cmd) => cmd.trim());
+
   return {
     readFile: {
-      enabled: process.env.TOOL_READ_FILE !== "false", // Default to enabled
+      enabled: process.env.TOOL_CALLING_READ_FILE_ENABLED !== "false", // Default to enabled
     },
     searchFiles: {
-      enabled: process.env.TOOL_SEARCH_FILES !== "false", // Default to enabled
+      enabled: process.env.TOOL_CALLING_SEARCH_FILES_ENABLED !== "false", // Default to enabled
     },
     listFiles: {
-      enabled: process.env.TOOL_LIST_FILES !== "false", // Default to enabled
+      enabled: process.env.TOOL_CALLING_LIST_FILES_ENABLED !== "false", // Default to enabled
     },
     writeToFile: {
-      enabled: process.env.TOOL_WRITE_FILE === "true", // Default to disabled for security
+      enabled: process.env.TOOL_CALLING_WRITE_TO_FILE_ENABLED === "true", // Default to disabled for security
     },
     replaceInFile: {
-      enabled: process.env.TOOL_REPLACE_IN_FILE === "true", // Default to disabled for security
+      enabled: process.env.TOOL_CALLING_REPLACE_IN_FILE_ENABLED === "true", // Default to disabled for security
     },
     executeCommand: {
-      enabled: process.env.TOOL_EXECUTE_COMMAND === "true", // Default to disabled for security
+      enabled: process.env.TOOL_CALLING_EXECUTE_COMMAND_ENABLED !== "false", // Default to enabled (as per ENV_REFERENCE)
     },
+    // Security restrictions
+    maxFileSizeKB: parseInt(
+      process.env.TOOL_CALLING_MAX_FILE_SIZE_KB || "1024"
+    ),
+    maxExecutionTimeSec: parseInt(
+      process.env.TOOL_CALLING_MAX_EXECUTION_TIME_SEC || "300"
+    ),
+    allowedFileExtensions,
+    allowedCommands,
+    // Tool-specific timeouts (in milliseconds)
+    timeoutThinkingValidationMs: parseInt(
+      process.env.TOOL_TIMEOUT_THINKING_VALIDATION_MS || "300000"
+    ),
+    timeoutImpactAnalysisMs: parseInt(
+      process.env.TOOL_TIMEOUT_IMPACT_ANALYSIS_MS || "300000"
+    ),
+    timeoutAssumptionCheckerMs: parseInt(
+      process.env.TOOL_TIMEOUT_ASSUMPTION_CHECKER_MS || "300000"
+    ),
+    timeoutDependencyMapperMs: parseInt(
+      process.env.TOOL_TIMEOUT_DEPENDENCY_MAPPER_MS || "300000"
+    ),
+    timeoutThinkingOptimizerMs: parseInt(
+      process.env.TOOL_TIMEOUT_THINKING_OPTIMIZER_MS || "300000"
+    ),
   };
 }
 

@@ -15,6 +15,13 @@ export default [
     plugins: {
       "@typescript-eslint": tseslint,
     },
+    settings: {
+      "import/resolver": {
+        typescript: {
+          alwaysTryTypes: true,
+        },
+      },
+    },
     rules: {
       // TypeScript rules
       "@typescript-eslint/no-explicit-any": "off",
