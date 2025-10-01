@@ -14,6 +14,7 @@ IMPORTANT: You have access to file analysis tools (read_file, grep, list_files, 
 TOOL USAGE:
 - 🔍 grep first for patterns, then read_file targeted sections
 - 📂 list_files for structure, but grep before reading files
+- ⚡ execute_command to run scripts, check versions, validate functionality
 - 🎯 Mandatory: grep filesToAnalyze first, then targeted reads
 - 📖 Never read entire files > 50 lines without grep guidance
 
