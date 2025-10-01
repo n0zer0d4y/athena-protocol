@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
-import { join } from "path";
+import { join, resolve, isAbsolute } from "path";
 import {
   ThinkingValidationRequest,
   ThinkingValidationResponse,
@@ -576,9 +576,17 @@ export class ThinkingValidator {
 
       for (const filePath of filesToAnalyze) {
         try {
-          const fullPath = workingDirectory
-            ? join(workingDirectory, filePath)
-            : join(projectRoot, filePath);
+          // Properly handle both absolute and relative paths
+          let fullPath: string;
+          if (isAbsolute(filePath)) {
+            // File path is already absolute, use it directly
+            fullPath = filePath;
+          } else {
+            // File path is relative, resolve relative to workingDirectory or projectRoot
+            fullPath = workingDirectory
+              ? resolve(workingDirectory, filePath)
+              : resolve(projectRoot, filePath);
+          }
 
           analysis.push(`### ${filePath}`);
 
