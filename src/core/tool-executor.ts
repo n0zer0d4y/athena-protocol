@@ -1,7 +1,9 @@
 /**
- * @license
- * Copyright 2025 Google LLC
- * SPDX-License-Identifier: Apache-2.0
+ * Tool Executor - Core execution engine for MCP tools
+ *
+ * This module provides the primary execution framework for all MCP tools within the Athena Protocol.
+ * It handles tool registration, parameter validation, execution coordination, and result processing
+ * for file system operations, shell commands, and development workflows.
  */
 
 import { readFileTool } from '../internal-tools/read-file.js';

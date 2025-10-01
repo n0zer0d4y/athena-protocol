@@ -1,7 +1,9 @@
 /**
- * @license
- * Copyright 2025 Google LLC
- * SPDX-License-Identifier: Apache-2.0
+ * File Reader Tool - MCP tool for reading individual files
+ *
+ * Provides efficient single-file reading capabilities with configurable encoding support
+ * and line-based reading options. Includes proper error handling and validation for
+ * file access operations within the Athena Protocol MCP Server ecosystem.
  */
 
 import { promises as fs } from 'fs';

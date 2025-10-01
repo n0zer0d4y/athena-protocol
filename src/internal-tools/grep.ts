@@ -1,7 +1,9 @@
 /**
- * @license
- * Copyright 2025 Google LLC
- * SPDX-License-Identifier: Apache-2.0
+ * Text Search Tool - MCP tool for pattern matching in files
+ *
+ * Implements powerful text search capabilities using regex patterns across file systems.
+ * Supports case-insensitive searches, multiline matching, context lines, and various output
+ * modes (content, files, counts) for comprehensive codebase analysis.
  */
 
 import { promises as fs } from 'fs';

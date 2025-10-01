@@ -1,7 +1,9 @@
 /**
- * @license
- * Copyright 2025 Google LLC
- * SPDX-License-Identifier: Apache-2.0
+ * File Writer Tool - MCP tool for writing files to disk
+ *
+ * Handles file writing operations with automatic directory creation, encoding support,
+ * and robust error handling. Provides atomic write operations and backup capabilities
+ * for safe file modifications within the MCP server environment.
  */
 
 import { promises as fs } from 'fs';

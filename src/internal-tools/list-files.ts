@@ -1,7 +1,9 @@
 /**
- * @license
- * Copyright 2025 Google LLC
- * SPDX-License-Identifier: Apache-2.0
+ * Directory Listing Tool - MCP tool for listing directory contents
+ *
+ * Provides comprehensive directory content listing with recursive support and filtering options.
+ * Supports both flat and hierarchical directory structures with configurable depth limits
+ * and pattern-based filtering for targeted file system exploration.
  */
 
 import { promises as fs } from 'fs';

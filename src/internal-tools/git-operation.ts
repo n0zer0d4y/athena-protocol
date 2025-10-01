@@ -1,7 +1,9 @@
 /**
- * @license
- * Copyright 2025 Google LLC
- * SPDX-License-Identifier: Apache-2.0
+ * Git Operations Tool - MCP tool for executing git commands
+ *
+ * Enables version control operations within the MCP server. Supports common git commands
+ * like status, commit, branch operations, and repository management. Provides safe execution
+ * with proper error handling and result formatting for development workflows.
  */
 
 import { exec } from 'child_process';

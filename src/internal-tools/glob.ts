@@ -1,7 +1,9 @@
 /**
- * @license
- * Copyright 2025 Google LLC
- * SPDX-License-Identifier: Apache-2.0
+ * File Pattern Tool - MCP tool for file globbing operations
+ *
+ * Provides advanced file pattern matching and discovery capabilities. Supports glob patterns
+ * for recursive directory traversal, file filtering, and batch file operations. Essential for
+ * project-wide file analysis and automated file processing workflows.
  */
 
 import { promises as fs } from 'fs';

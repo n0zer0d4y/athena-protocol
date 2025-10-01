@@ -1,7 +1,9 @@
 /**
- * @license
- * Copyright 2025 Google LLC
- * SPDX-License-Identifier: Apache-2.0
+ * Shell Execution Tool - MCP tool for running shell commands
+ *
+ * Provides secure shell command execution capabilities within the MCP server environment.
+ * Supports both simple command execution and complex shell operations with proper
+ * working directory management, timeout controls, and output capture.
  */
 
 import { exec } from 'child_process';

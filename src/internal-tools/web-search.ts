@@ -1,7 +1,9 @@
 /**
- * @license
- * Copyright 2025 Google LLC
- * SPDX-License-Identifier: Apache-2.0
+ * Web Search Tool - MCP tool for performing web searches
+ *
+ * Provides web search capabilities within the MCP server ecosystem. Supports configurable
+ * result limits and structured response formatting. Currently implements a placeholder
+ * that can be extended with real web search API integrations.
  */
 
 export async function webSearchTool(args: {

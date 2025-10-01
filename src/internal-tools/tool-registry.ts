@@ -1,7 +1,9 @@
 /**
- * @license
- * Copyright 2025 Google LLC
- * SPDX-License-Identifier: Apache-2.0
+ * Tool Registry - Central registry for all MCP server tools
+ *
+ * This module provides a centralized registry that manages and exports all available
+ * MCP tools including file operations, shell commands, search capabilities, and git operations.
+ * It serves as the main entry point for tool discovery and registration within the Athena Protocol MCP Server.
  */
 
 import { readFileTool } from "./read-file.js";

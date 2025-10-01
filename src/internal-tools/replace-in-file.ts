@@ -1,7 +1,10 @@
 /**
- * Replace In File Tool
- * Allows targeted text replacement within files
- * SECURITY WARNING: Only enable in trusted environments
+ * Replace In File Tool - MCP tool for targeted text replacement within files
+ *
+ * Provides secure text replacement capabilities for file content modification. Supports
+ * targeted string replacement with validation, error handling, and logging. Includes
+ * file existence checks and content verification before performing replacements.
+ * SECURITY WARNING: Only enable in trusted environments.
  */
 
 import { promises as fs } from "fs";

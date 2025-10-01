@@ -1,7 +1,9 @@
 /**
- * @license
- * Copyright 2025 Google LLC
- * SPDX-License-Identifier: Apache-2.0
+ * Batch File Reader - MCP tool for reading multiple files efficiently
+ *
+ * Optimized for reading multiple files in batch operations. Provides efficient file reading
+ * with configurable encoding support, error handling, and parallel processing capabilities.
+ * Essential for large-scale codebase analysis and multi-file operations.
  */
 
 import { promises as fs } from 'fs';

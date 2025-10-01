@@ -1,7 +1,9 @@
 /**
- * @license
- * Copyright 2025 Google LLC
- * SPDX-License-Identifier: Apache-2.0
+ * Logger Utility - Centralized logging functionality for MCP server
+ *
+ * Provides consistent logging across the Athena Protocol MCP Server with support for
+ * different log levels (info, error, warn, debug). Includes environment-based debug output
+ * control and standardized message formatting for development and production use.
  */
 
 export const logger = {
