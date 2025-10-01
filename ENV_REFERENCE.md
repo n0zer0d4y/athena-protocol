@@ -287,8 +287,8 @@ TOOL_CALLING_LIST_FILES_ENABLED=true # List directory contents
 
 # File Writing Tools (use with caution - high risk)
 # Only enable if you need the LLM to modify files
-TOOL_CALLING_WRITE_TO_FILE_ENABLED=false # Create or overwrite files
-TOOL_CALLING_REPLACE_IN_FILE_ENABLED=false # Make targeted file edits
+TOOL_CALLING_WRITE_TO_FILE_ENABLED=true # Create or overwrite files
+TOOL_CALLING_REPLACE_IN_FILE_ENABLED=true # Make targeted file edits
 
 # System Tools (highest risk - critical)
 # Only enable for trusted environments with proper security measures
