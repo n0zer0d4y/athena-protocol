@@ -88,9 +88,6 @@ const limiter = rateLimit({
   legacyHeaders: false,
 });
 
-// Apply rate limiting to all routes
-app.use(limiter);
-
 // More strict rate limiting for auth routes
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
@@ -142,13 +139,15 @@ const connectDB = async () => {
       if (retries > 0) {
         console.log(`Retrying in 5 seconds... (${retries} attempts remaining)`);
         await new Promise((resolve) => setTimeout(resolve, 5000));
+      } else {
+        console.error("Failed to connect to MongoDB after 5 attempts");
+        if (process.env.NODE_ENV === 'production') {
+          process.exit(1);
+        } else {
+          console.log("Continuing without database in development mode...");
+        }
       }
     }
-  }
-
-  if (retries === 0) {
-    console.error("Failed to connect to MongoDB after 5 attempts");
-    process.exit(1);
   }
 };
 
@@ -331,6 +330,8 @@ const notFoundHandler = (req, res) => {
 // Routes
 app.use("/api/users", userRoutes);
 
+app.use(limiter);
+
 // Additional API routes
 app.get("/api", (req, res) => {
   res.json({
@@ -373,17 +374,24 @@ app.get("/api/status", async (req, res) => {
   }
 });
 
-// User registration endpoint (additional to routes/user.js)
+// User registration endpoint
 app.post("/api/auth/register", async (req, res) => {
   try {
     const { username, email, password, firstName, lastName } = req.body;
 
-    // Validate required fields
     if (!username || !email || !password || !firstName || !lastName) {
       return res.status(400).json({ error: "All fields are required" });
     }
 
-    // Check if user already exists
+    const emailRegex = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ error: "Invalid email format" });
+    }
+
+    if (password.length < 8) {
+      return res.status(400).json({ error: "Password must be at least 8 characters" });
+    }
+
     const existingUser = await User.findOne({
       $or: [
         { email: email.toLowerCase() },
@@ -395,7 +403,6 @@ app.post("/api/auth/register", async (req, res) => {
       return res.status(400).json({ error: "User already exists" });
     }
 
-    // Create new user
     const user = new User({
       username,
       email,
@@ -406,6 +413,13 @@ app.post("/api/auth/register", async (req, res) => {
 
     await user.save();
 
+    const jwt = require('jsonwebtoken');
+    const token = jwt.sign(
+      { userId: user._id, email: user.email },
+      process.env.JWT_SECRET || 'server-jwt-secret',
+      { expiresIn: '7d' }
+    );
+
     res.status(201).json({
       message: "User registered successfully",
       user: {
@@ -415,6 +429,7 @@ app.post("/api/auth/register", async (req, res) => {
         firstName: user.firstName,
         lastName: user.lastName,
       },
+      token,
     });
   } catch (error) {
     console.error("Registration error:", error);
