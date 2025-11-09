@@ -6,6 +6,11 @@ import {
   createToolRegistry,
   ToolRegistry,
 } from "../internal-tools/tool-registry.js";
+import {
+  ReadFileArgs,
+  ReadFileRequest,
+  EditFileArgs,
+} from "../types/internal-tool-types.js";
 
 const execAsync = promisify(exec);
 
@@ -38,8 +43,15 @@ export class ToolCallingService {
     this.toolRegistry = createToolRegistry();
   }
 
-  async readFile(
-    filePath: string
+  // ============================================================================
+  // ENHANCED FILE READING (with modes: full/head/tail/range)
+  // ============================================================================
+
+  /**
+   * Read file with mode support (enhanced version)
+   */
+  async readFileWithMode(
+    args: ReadFileArgs
   ): Promise<{ success: boolean; content?: string; error?: string }> {
     if (!this.config.readFile.enabled) {
       return {
@@ -49,7 +61,7 @@ export class ToolCallingService {
     }
 
     // Validate file extension
-    const fileExt = this.getFileExtension(filePath);
+    const fileExt = this.getFileExtension(args.path);
     if (!this.config.allowedFileExtensions.includes(fileExt)) {
       return {
         success: false,
@@ -60,7 +72,7 @@ export class ToolCallingService {
     }
 
     try {
-      const result = await this.toolRegistry.readFile({ path: filePath });
+      const result = await this.toolRegistry.readFile(args);
 
       // Check file size limit if content was successfully read
       if (result.success && result.content) {
@@ -83,12 +95,89 @@ export class ToolCallingService {
         error: result.error,
       };
     } catch (error) {
-      logger.error(`Error reading file ${filePath}:`, error);
+      logger.error(`Error reading file ${args.path}:`, error);
       return {
         success: false,
         error: `Failed to read file: ${(error as Error).message}`,
       };
     }
+  }
+
+  /**
+   * Read multiple files concurrently with per-file mode support
+   */
+  async readMultipleFiles(
+    files: ReadFileRequest[]
+  ): Promise<{
+    success: boolean;
+    results: Array<{ path: string; content?: string; error?: string }>;
+    error?: string;
+  }> {
+    if (!this.config.readFile.enabled) {
+      return {
+        success: false,
+        results: [],
+        error: "File reading is disabled in configuration",
+      };
+    }
+
+    // Validate file extensions for all files
+    for (const fileRequest of files) {
+      const fileExt = this.getFileExtension(fileRequest.path);
+      if (!this.config.allowedFileExtensions.includes(fileExt)) {
+        return {
+          success: false,
+          results: [],
+          error: `File extension '${fileExt}' is not allowed for ${fileRequest.path}. Allowed extensions: ${this.config.allowedFileExtensions.join(
+            ", "
+          )}`,
+        };
+      }
+    }
+
+    try {
+      const result = await this.toolRegistry.readMultipleFiles({ files });
+
+      // Check file size limits for all results
+      for (const fileResult of result.results) {
+        if (fileResult.content) {
+          const fileSizeKB = Buffer.byteLength(fileResult.content, "utf8") / 1024;
+          if (fileSizeKB > this.config.maxFileSizeKB) {
+            fileResult.error = `File size (${fileSizeKB.toFixed(
+              1
+            )}KB) exceeds maximum allowed size (${
+              this.config.maxFileSizeKB
+            }KB)`;
+            fileResult.content = undefined;
+          }
+        }
+      }
+
+      return {
+        success: result.success,
+        results: result.results,
+      };
+    } catch (error) {
+      logger.error(`Error reading multiple files:`, error);
+      return {
+        success: false,
+        results: [],
+        error: `Failed to read files: ${(error as Error).message}`,
+      };
+    }
+  }
+
+  /**
+   * Legacy readFile method (backward compatibility)
+   * Delegates to enhanced readFileWithMode
+   */
+  async readFile(
+    filePath: string
+  ): Promise<{ success: boolean; content?: string; error?: string }> {
+    return this.readFileWithMode({
+      path: filePath,
+      mode: "full",
+    });
   }
 
   async listFiles(
@@ -255,47 +344,82 @@ export class ToolCallingService {
     return { success: false, error: "File writing not implemented" };
   }
 
-  async replaceInFile(
-    filePath: string,
-    oldString: string,
-    newString: string
-  ): Promise<{ success: boolean; error?: string }> {
+  // ============================================================================
+  // ENHANCED FILE EDITING (with matching strategies)
+  // ============================================================================
+
+  /**
+   * Edit file with advanced matching strategies (enhanced version)
+   */
+  async editFile(
+    args: EditFileArgs
+  ): Promise<{
+    success: boolean;
+    diff?: string;
+    changes?: {
+      linesAdded: number;
+      linesRemoved: number;
+      editsApplied: number;
+    };
+    error?: string;
+  }> {
     if (!this.config.replaceInFile.enabled) {
       return {
         success: false,
         error:
-          "File replacement is disabled in configuration for security reasons",
+          "File editing is disabled in configuration for security reasons",
       };
     }
 
     // Validate file extension
-    const fileExt = this.getFileExtension(filePath);
+    const fileExt = this.getFileExtension(args.path);
     if (!this.config.allowedFileExtensions.includes(fileExt)) {
       return {
         success: false,
-        error: `File extension '${fileExt}' is not allowed for replacement. Allowed extensions: ${this.config.allowedFileExtensions.join(
+        error: `File extension '${fileExt}' is not allowed for editing. Allowed extensions: ${this.config.allowedFileExtensions.join(
           ", "
         )}`,
       };
     }
 
     try {
-      const result = await this.toolRegistry.replaceInFile({
-        path: filePath,
-        oldString,
-        newString,
-      });
+      const result = await this.toolRegistry.editFile(args);
       return {
         success: result.success,
+        diff: result.diff,
+        changes: result.changes,
         error: result.error,
       };
     } catch (error) {
-      logger.error(`Error replacing in file ${filePath}:`, error);
+      logger.error(`Error editing file ${args.path}:`, error);
       return {
         success: false,
-        error: `Failed to replace in file: ${(error as Error).message}`,
+        error: `Failed to edit file: ${(error as Error).message}`,
       };
     }
+  }
+
+  /**
+   * Legacy replaceInFile method (backward compatibility)
+   * Delegates to enhanced editFile with exact matching
+   */
+  async replaceInFile(
+    filePath: string,
+    oldString: string,
+    newString: string
+  ): Promise<{ success: boolean; error?: string }> {
+    const result = await this.editFile({
+      path: filePath,
+      edits: [{ oldText: oldString, newText: newString, expectedOccurrences: 1 }],
+      matchingStrategy: "exact",
+      dryRun: false,
+      failOnAmbiguous: true,
+    });
+
+    return {
+      success: result.success,
+      error: result.error,
+    };
   }
 
   // Helper method to get file extension
