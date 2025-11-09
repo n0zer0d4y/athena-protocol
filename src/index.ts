@@ -1,5 +1,9 @@
 #!/usr/bin/env node
 
+// Silence AI SDK warnings BEFORE any imports (temperature not supported for reasoning models)
+// @ts-ignore - Setting global before AI SDK loads
+globalThis.AI_SDK_LOG_WARNINGS = false;
+
 // Ensure we load dotenv from the correct location (relative to this script)
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
@@ -43,6 +47,7 @@ function loadEnvironmentVariables() {
 
 // Load environment variables - fail fast if not found
 const envVars = loadEnvironmentVariables();
+
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import {
@@ -269,7 +274,7 @@ Focused Outputs:
       "projectContext",
       "projectBackground",
     ],
-  },
+  }
 };
 
 const IMPACT_ANALYSIS_TOOL: Tool = {
@@ -432,7 +437,7 @@ Focused Outputs:
       },
     },
     required: ["change", "projectContext", "projectBackground"],
-  },
+  }
 };
 
 const ASSUMPTION_CHECKER_TOOL: Tool = {
@@ -573,7 +578,7 @@ Focused Outputs:
       },
     },
     required: ["assumptions", "context", "projectContext", "projectBackground"],
-  },
+  }
 };
 
 const DEPENDENCY_MAPPER_TOOL: Tool = {
@@ -717,7 +722,7 @@ Focused Outputs:
       },
     },
     required: ["change", "projectContext", "projectBackground"],
-  },
+  }
 };
 
 const THINKING_OPTIMIZER_TOOL: Tool = {
@@ -857,7 +862,7 @@ Focused Outputs:
       "projectContext",
       "projectBackground",
     ],
-  },
+  }
 };
 
 // Using the consolidated health check tool from simple-health-check.ts
