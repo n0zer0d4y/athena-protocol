@@ -1,253 +1,406 @@
 # Athena Protocol MCP Server
 
-A comprehensive MCP server that harmonizes the Athena Protocol thinking validation system with internal file system tools. This server provides AI-powered thinking validation, impact analysis, assumption checking, dependency mapping, and thinking optimization, with full access to client project files for comprehensive code analysis.
+[![license](https://img.shields.io/github/license/:user/:repo.svg)](LICENSE)
+[![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg?style=flat-square)](https://github.com/RichardLitt/standard-readme)
 
-## Features
+A comprehensive, intelligent MCP server designed to provide systematic thinking validation for LLM coding agents. This server enables AI agents to achieve higher accuracy through focused validation of reasoning processes before action, with streamlined communication to prevent endless loops and information overload.
 
-,### 🧠 Athena Protocol Thinking Validation
+**Latest Enhancement:** Smart Client Mode with `analysisTargets` - achieve 70-85% token reduction and 3-4× faster performance with precision-targeted code analysis. See [Enhanced File Analysis](#enhanced-file-analysis-new) for details.
 
-- **thinking_validation**: Validate reasoning processes before action
-- **impact_analysis**: Analyze change impacts on system architecture
-- **assumption_checker**: Validate key assumptions with evidence
-- **dependency_mapper**: Identify critical dependencies and relationships
-- **thinking_optimizer**: Optimize thinking approaches based on problem type
+## Table of Contents
 
-### 🔧 Integrated File System Tools
+- [Security](#security)
+- [Background](#background)
+- [Install](#install)
+- [Usage](#usage)
+- [API](#api)
+- [Contributing](#contributing)
+- [License](#license)
 
-The thinking validation tools have full access to client project files:
+## Security
 
-#### File Analysis Capabilities
+This server handles API keys for multiple LLM providers. Ensure your `.env` file is properly secured and never committed to version control. The server validates all API keys on startup and provides detailed error messages for configuration issues.
 
-- **Project Structure Analysis**: Automatically analyze project layout and key files
-- **Code Reading**: Read and analyze source files for context
-- **Content Search**: Search through codebases using regex patterns
-- **Directory Traversal**: Navigate and understand project hierarchies
+## Background
 
-#### Supported Operations
+The Athena Protocol MCP Server provides systematic thinking validation for AI coding agents. It supports 15 LLM providers and offers various validation tools including thinking validation, impact analysis, assumption checking, dependency mapping, and thinking optimization.
 
-- Read individual files or multiple files efficiently
-- Search for content patterns across entire projects
-- List directory contents with recursive support
-- Analyze file relationships and dependencies
+Key features:
 
-### 🎯 MCP Client Integration
+- **Smart Client Mode** with precision-targeted code analysis (70-85% token reduction)
+- Environment-driven configuration with no hardcoded defaults
+- Multi-provider LLM support (15 providers) with automatic fallback
+- Enhanced file reading with multiple modes (full, head, tail, range)
+- Concurrent file operations for 3-4× performance improvement
+- Session-based validation history and memory management
+- Comprehensive configuration validation and health monitoring
+- Dual-agent architecture for efficient validation workflows
 
-- **Direct Tool Access**: MCP clients can call Athena Protocol tools directly
-- **Project Context**: Tools receive projectRoot, filesToAnalyze, and workingDirectory
-- **File-Based Analysis**: Internal tools analyze client projects for comprehensive validation
-- **Session Management**: Maintains validation history and context across sessions
+## Install
 
-## Setup
-
-### Prerequisites
-
-- Node.js 20 or higher
-- Google API key for Gemini AI
-
-### Installation
-
-1. Clone or download the project
-2. Install dependencies:
+This module depends upon a knowledge of Node.js and npm.
 
 ```bash
 npm install
-```
-
-3. Configure environment variables:
-
-```bash
-cp .env.example .env
-```
-
-4. Edit `.env` file with your Google API key:
-
-```env
-GOOGLE_API_KEY=your_google_api_key_here
-GEMINI_MODEL=gemini-2.0-flash-exp
-```
-
-### Running the Server
-
-#### Development Mode
-
-```bash
-npm run dev
-```
-
-#### Production Mode
-
-```bash
 npm run build
-npm start
 ```
 
-## MCP Client Configuration
+### Prerequisites
 
-To use this MCP server with an MCP client (like Claude Desktop or other AI coding agents), configure the client to connect to this server using stdio transport.
+- Node.js >= 18
+- npm or yarn
 
-### Example Configuration (Claude Desktop)
+### Configuration
 
-Add this configuration to your Claude Desktop MCP settings:
+The Athena Protocol uses 100% environment-driven configuration - no hardcoded provider values or defaults. Configure everything through your `.env` file:
 
-```json
-{
-  "mcpServers": {
-    "athena-protocol": {
-      "command": "node",
-      "args": ["dist/index.js"],
-      "cwd": "/absolute/path/to/athena-protocol-mcp-server",
-      "type": "stdio",
-      "timeout": 60,
-      "autoApprove": [
-        "thinking_validation",
-        "impact_analysis",
-        "assumption_checker",
-        "dependency_mapper",
-        "thinking_optimizer"
-      ]
-    }
-  }
-}
+```bash
+# 1. Get your API key from any supported provider
+# 2. Create .env file with REQUIRED configuration:
+echo "DEFAULT_LLM_PROVIDER=openai" > .env
+echo "PROVIDER_SELECTION_PRIORITY=openai,anthropic,google" >> .env
+echo "OPENAI_API_KEY=sk-your-openai-api-key-here" >> .env
+echo "OPENAI_MODEL=gpt-4-turbo" >> .env
+echo "OPENAI_TEMPERATURE=0.7" >> .env
+echo "OPENAI_MAX_TOKENS=4000" >> .env
+
+# 3. Install and test
+npm install
+npm run build
+npm run validate-config  # This will validate your configuration
+npm test
 ```
 
-**Important Notes:**
+#### Critical Configuration Requirements
 
-- Replace `/absolute/path/to/athena-protocol-mcp-server` with the actual absolute path to this project
-- The server already contains API keys in its `.env` file, so no additional environment variables are needed
-- The `autoApprove` setting allows the thinking validation tools to run without manual approval
-- The server must be built first with `npm run build` before use
+- `PROVIDER_SELECTION_PRIORITY` is REQUIRED - list your providers in priority order
+- No hardcoded fallbacks exist - all configuration must be explicit in `.env`
+- Fail-fast validation - invalid configuration causes immediate startup failure
+- Complete provider config required - API key, model, and parameters for each provider
+
+#### Supported Providers
+
+The Athena Protocol supports 15 LLM providers. While OpenAI is commonly used, you can configure any of:
+
+**Major Cloud Providers:**
+
+- OpenAI - GPT-4, GPT-4-turbo, GPT-3.5-turbo
+- Anthropic - Claude 3 Sonnet/Opus/Haiku
+- Google - Gemini Pro/Pro Vision
+- Azure OpenAI - Enterprise-grade GPT models
+- AWS Bedrock - Claude, Llama, and more
+- Google Vertex AI - Gemini with enterprise features
+
+**Specialized Providers:**
+
+- OpenRouter - Access to 200+ models
+- Groq - Ultra-fast inference
+- Mistral AI - Open-source models
+- Perplexity - Search-augmented models
+- XAI - Grok models
+- Qwen - Alibaba's high-performance LLMs
+
+**Local/Self-Hosted:**
+
+- Ollama - Run models locally
+- ZAI - Custom deployments
+
+Quick switch example:
+
+```bash
+# Edit .env file
+ANTHROPIC_API_KEY=sk-ant-your-key-here
+DEFAULT_LLM_PROVIDER=anthropic
+
+# Restart server
+npm run build && npm start
+```
+
+#### Provider Switching
+
+See the [detailed provider guide](./PROVIDER_GUIDE.md) for complete setup instructions.
 
 ## Usage
 
-### Basic Chat
+### Server Modes
 
-The server exposes a single `chat` tool that accepts natural language messages:
+#### MCP Server Mode (for production use)
+
+```bash
+npm start                    # Start MCP server for client integration
+npm run dev                  # Development mode with auto-restart
+```
+
+#### Standalone Mode (for testing)
+
+```bash
+npm run start:standalone     # Test server without MCP client
+npm run dev:standalone       # Development standalone mode
+```
+
+### Configuration Tools
+
+```bash
+# Validate your complete configuration
+npm run validate-config
+
+# Or use the comprehensive MCP validation tool
+node dist/index.js
+# Then call: validate_configuration_comprehensive
+```
+
+### Key Features
+
+#### Multi-Provider LLM Support
+
+Athena Protocol supports 15 providers including:
+
+- **Cloud Providers**: OpenAI, Anthropic, Google, Azure OpenAI, AWS Bedrock, Vertex AI
+- **Specialized**: OpenRouter (200+ models), Groq, Mistral, Perplexity, XAI, Qwen
+- **Local/Self-Hosted**: Ollama, ZAI
+
+All providers require API keys (except Ollama for local models). See configuration section for setup.
+
+#### Intelligent Thinking Validation
+
+- Focused Validation: Validates essential aspects of reasoning with streamlined communication
+- Dual-Agent Architecture: Primary agent and validation agent work in partnership
+- Confidence Scoring: Explicit confidence levels to guide decision-making
+- Loop Prevention: Maximum 3 exchanges per task to prevent analysis paralysis
+
+#### Systematic Approach
+
+- Essential Information Only: Share what's necessary for effective validation
+- Actionable Outputs: Clear, specific recommendations that can be immediately applied
+- Progressive Refinement: Start broad, get specific only when needed
+- Session Management: Maintains persistent validation sessions across multiple attempts
+
+#### Dual Mode Operation
+
+- MCP Server Mode: Full integration with MCP clients (Claude Desktop, Cline, etc.)
+- Standalone Mode: Independent testing and verification without MCP client
+
+## API
+
+The Athena Protocol MCP Server provides the following tools for thinking validation and analysis:
+
+### thinking_validation
+
+Validate the primary agent's thinking process with focused, essential information.
+
+**Required Parameters:**
+
+- `thinking` (string): Brief explanation of the approach and reasoning
+- `proposedChange` (object): Details of the proposed change
+  - `description` (string, required): What will be changed
+  - `code` (string, optional): The actual code change
+  - `files` (array, optional): Files that will be affected
+- `context` (object): Context for the validation
+  - `problem` (string, required): Brief problem description
+  - `techStack` (string, required): Technology stack (react|node|python etc)
+  - `constraints` (array, optional): Key constraints
+- `urgency` (string): Urgency level (`low`, `medium`, or `high`)
+- `projectContext` (object): Project context for file analysis
+  - `projectRoot` (string, required): Absolute path to project root
+  - `filesToAnalyze` (array, optional): Array of absolute file paths (legacy mode)
+  - `workingDirectory` (string, optional): Current working directory
+  - `analysisTargets` (array, optional): **NEW** - Specific code sections with targeted reading
+    - `file` (string, required): File path (relative or absolute)
+    - `mode` (string, optional): Read mode - `full`, `head`, `tail`, or `range`
+    - `lines` (number, optional): Number of lines (for head/tail modes)
+    - `startLine` (number, optional): Start line number (for range mode, 1-indexed)
+    - `endLine` (number, optional): End line number (for range mode, 1-indexed)
+    - `priority` (string, optional): Analysis priority - `critical`, `important`, or `supplementary`
+- `projectBackground` (string): Brief project description to prevent hallucination
+
+**Optional Parameters:**
+
+- `sessionId` (string): Session ID for context persistence
+- `provider` (string): LLM provider override (openai, anthropic, google, etc.)
+
+**Output:**
+
+Returns validation results with confidence score, critical issues, recommendations, and test cases.
+
+### impact_analysis
+
+Quickly identify key impacts of proposed changes.
+
+**Required Parameters:**
+
+- `change` (object): Details of the change
+  - `description` (string, required): What is being changed
+  - `code` (string, optional): The code change
+  - `files` (array, optional): Affected files
+- `projectContext` (object): Project context (same structure as thinking_validation)
+  - `projectRoot` (string, required)
+  - `filesToAnalyze` or `analysisTargets` (optional)
+  - `workingDirectory` (optional)
+- `projectBackground` (string): Brief project description
+
+**Optional Parameters:**
+
+- `systemContext` (object): System architecture context
+  - `architecture` (string): Brief architecture description
+  - `keyDependencies` (array): Key system dependencies
+- `sessionId` (string): Session ID for context persistence
+- `provider` (string): LLM provider override
+
+**Output:**
+
+Returns overall risk assessment, affected areas, cascading risks, and quick tests to run.
+
+### assumption_checker
+
+Rapidly validate key assumptions without over-analysis.
+
+**Required Parameters:**
+
+- `assumptions` (array): List of assumption strings to validate
+- `context` (object): Validation context
+  - `component` (string, required): Component name
+  - `environment` (string, required): Environment (production, development, staging, testing)
+- `projectContext` (object): Project context (same structure as thinking_validation)
+  - `projectRoot` (string, required)
+  - `filesToAnalyze` or `analysisTargets` (optional)
+- `projectBackground` (string): Brief project description
+
+**Optional Parameters:**
+
+- `sessionId` (string): Session ID for context persistence
+- `provider` (string): LLM provider override
+
+**Output:**
+
+Returns valid assumptions, risky assumptions with mitigations, and quick verification steps.
+
+### dependency_mapper
+
+Identify critical dependencies efficiently.
+
+**Required Parameters:**
+
+- `change` (object): Details of the change
+  - `description` (string, required): Brief change description
+  - `files` (array, optional): Files being modified
+  - `components` (array, optional): Components being changed
+- `projectContext` (object): Project context (same structure as thinking_validation)
+  - `projectRoot` (string, required)
+  - `filesToAnalyze` or `analysisTargets` (optional)
+- `projectBackground` (string): Brief project description
+
+**Optional Parameters:**
+
+- `sessionId` (string): Session ID for context persistence
+- `provider` (string): LLM provider override
+
+**Output:**
+
+Returns critical and secondary dependencies, with impact analysis and test focus areas.
+
+### thinking_optimizer
+
+Optimize thinking approach based on problem type.
+
+**Required Parameters:**
+
+- `problemType` (string): Type of problem (`bug_fix`, `feature_impl`, or `refactor`)
+- `complexity` (string): Complexity level (`simple`, `moderate`, or `complex`)
+- `timeConstraint` (string): Time constraint (`tight`, `moderate`, or `flexible`)
+- `currentApproach` (string): Brief description of current thinking
+- `projectContext` (object): Project context (same structure as thinking_validation)
+  - `projectRoot` (string, required)
+  - `filesToAnalyze` or `analysisTargets` (optional)
+- `projectBackground` (string): Brief project description
+
+**Optional Parameters:**
+
+- `sessionId` (string): Session ID for context persistence
+- `provider` (string): LLM provider override
+
+**Output:**
+
+Returns optimized strategy, recommended tools, time allocation, success probability, and key focus areas.
+
+### athena_health_check
+
+Check the health status and configuration of the Athena Protocol server.
+
+**Parameters:** None
+
+**Output:**
+
+Returns default provider, list of active providers with valid API keys, configuration status, and system health information.
+
+### session_management
+
+Manage thinking validation sessions for context persistence and progress tracking.
+
+**Required Parameters:**
+
+- `action` (string): Session action - `create`, `get`, `update`, `list`, or `delete`
+
+**Optional Parameters:**
+
+- `sessionId` (string): Session ID (required for get, update, delete actions)
+- `tags` (array): Tags to categorize the session
+- `title` (string): Session title/description (for create/update)
+
+**Output:**
+
+Returns session information or list of sessions depending on the action.
+
+---
+
+### Enhanced File Analysis (NEW)
+
+All tools now support **Smart Client Mode** with `analysisTargets` for precision targeting:
+
+**Benefits:**
+
+- **70-85% token reduction** by reading only relevant code sections
+- **3-4× faster** with concurrent file reading
+- **Mode-based reading**: full, head (first N lines), tail (last N lines), range (lines X-Y)
+- **Priority processing**: critical → important → supplementary
+
+**Example:**
 
 ```json
 {
-  "name": "chat",
-  "arguments": {
-    "message": "Help me understand the structure of this project",
-    "context": "Previous conversation context (optional)"
+  "projectContext": {
+    "projectRoot": "/path/to/project",
+    "analysisTargets": [
+      {
+        "file": "src/auth.ts",
+        "mode": "range",
+        "startLine": 45,
+        "endLine": 78,
+        "priority": "critical"
+      },
+      {
+        "file": "src/config.ts",
+        "mode": "head",
+        "lines": 20,
+        "priority": "supplementary"
+      }
+    ]
   }
 }
 ```
 
-### Example Interactions
-
-#### Project Analysis
-
-```
-User: "Analyze this codebase and tell me what it does"
-AI: "I'll analyze the project structure and code to understand its purpose..."
-```
-
-#### Code Implementation
-
-```
-User: "Add a new feature to validate user input"
-AI: "I'll help you implement user input validation. Let me first explore the codebase..."
-```
-
-#### Debugging
-
-```
-User: "There's a bug in the login function"
-AI: "I'll help you debug the login function. Let me examine the relevant files..."
-```
-
-#### File Operations
-
-```
-User: "Create a new utility function for date formatting"
-AI: "I'll create a date formatting utility function for you..."
-```
-
-## Customization
-
-### System Prompts
-
-You can customize the AI's behavior by modifying the system prompt in `src/mcp-server/prompts/system-prompt.ts`. The prompt defines:
-
-- AI capabilities and available tools
-- Guidelines for task execution
-- Example workflows
-- Behavioral constraints
-
-### Environment Variables
-
-- `GOOGLE_API_KEY`: Your Google API key for Gemini AI
-- `GEMINI_MODEL`: The Gemini model to use (default: gemini-2.0-flash-exp)
-- `DEBUG`: Enable debug logging (default: false)
-- `LOG_LEVEL`: Logging level (default: info)
-
-## Project Structure
-
-```
-src/mcp-server/
-├── index.ts              # Main MCP server entry point
-├── core/
-│   └── llm-agent.ts      # LLM agent implementation
-├── internal-tools/       # Internal tools for AI agent
-│   ├── tool-registry.ts  # Tool registry
-│   ├── read-file.ts      # File reading
-│   ├── write-file.ts     # File writing
-│   ├── list-files.ts     # Directory listing
-│   ├── read-many-files.ts # Multiple file reading
-│   ├── glob.ts          # Glob pattern matching
-│   ├── grep.ts          # Content search
-│   ├── execute-shell.ts # Shell execution
-│   ├── git-operation.ts # Git operations
-│   └── web-search.ts    # Web search
-├── prompts/
-│   └── system-prompt.ts # System prompts
-└── utils/
-    └── logger.ts        # Logging utilities
-```
-
-## Development
-
-### Building
-
-```bash
-npm run build
-```
-
-### Type Checking
-
-```bash
-npm run typecheck
-```
-
-### Linting
-
-```bash
-npm run lint
-```
-
-### Testing
-
-The server can be tested by running it and connecting with an MCP client.
-
-## Security Considerations
-
-- The server executes shell commands - ensure proper access controls
-- File operations are restricted to the file system the server has access to
-- API keys should be kept secure and not committed to version control
-- Consider running the server in a sandboxed environment for production use
-
-## License
-
-This project is licensed under the Apache 2.0 License.
+**Backward Compatible:** The legacy `filesToAnalyze` parameter still works, falling back to enhanced pre-analysis when `analysisTargets` is not provided.
 
 ## Contributing
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
+This server is designed specifically for LLM coding agents. Contributions should focus on:
 
-## Support
+- Adding new LLM providers
+- Improving validation effectiveness
+- Enhancing context awareness
+- Expanding validation coverage
+- Optimizing memory management
+- Adding new validation strategies
 
-For issues and questions, please refer to the project documentation or create an issue in the repository.
+## License
+
+MIT License - see LICENSE file for details.
