@@ -1,9 +1,23 @@
 // Thinking Validation Types for Athena Protocol
 
+/**
+ * Analysis target for client-driven targeted analysis
+ * Allows clients to specify exact code sections to analyze
+ */
+export interface AnalysisTarget {
+  file: string;
+  mode?: "full" | "head" | "tail" | "range";
+  lines?: number;
+  startLine?: number;
+  endLine?: number;
+  priority?: "critical" | "important" | "supplementary";
+}
+
 export interface ProjectContext {
   projectRoot: string;
-  filesToAnalyze: string[];
+  filesToAnalyze?: string[];  // Made optional for backward compatibility
   workingDirectory?: string;
+  analysisTargets?: AnalysisTarget[];  // NEW: Client-driven targeting
 }
 
 export interface ThinkingValidationRequest {
