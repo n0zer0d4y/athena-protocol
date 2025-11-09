@@ -6,10 +6,9 @@
  * for file system operations, shell commands, and development workflows.
  */
 
-import { readFileTool } from '../internal-tools/read-file.js';
+import { readFileTool, readMultipleFilesTool } from '../internal-tools/unified-read-files.js';
 import { writeFileTool } from '../internal-tools/write-file.js';
 import { listFilesTool } from '../internal-tools/list-files.js';
-import { readManyFilesTool } from '../internal-tools/read-many-files.js';
 import { globTool } from '../internal-tools/glob.js';
 import { grepTool } from '../internal-tools/grep.js';
 import { executeShellTool } from '../internal-tools/execute-shell.js';
@@ -33,7 +32,7 @@ export class ToolExecutor {
     this.tools.set('readFile', readFileTool);
     this.tools.set('writeFile', writeFileTool);
     this.tools.set('listFiles', listFilesTool);
-    this.tools.set('readManyFiles', readManyFilesTool);
+    this.tools.set('readManyFiles', readMultipleFilesTool);
     this.tools.set('glob', globTool);
     this.tools.set('grep', grepTool);
     this.tools.set('executeShell', executeShellTool);

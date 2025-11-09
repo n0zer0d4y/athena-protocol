@@ -22,16 +22,16 @@ export interface ToolCallingConfig {
   replaceInFile: { enabled: boolean };
   executeCommand: { enabled: boolean };
   // Security restrictions
-  maxFileSizeKB: number;
-  maxExecutionTimeSec: number;
-  allowedFileExtensions: string[];
-  allowedCommands: string[];
+  maxFileSizeKB?: number;
+  maxExecutionTimeSec?: number;
+  allowedFileExtensions?: string[];
+  allowedCommands?: string[];
   // Tool-specific timeouts (in milliseconds)
-  timeoutThinkingValidationMs: number;
-  timeoutImpactAnalysisMs: number;
-  timeoutAssumptionCheckerMs: number;
-  timeoutDependencyMapperMs: number;
-  timeoutThinkingOptimizerMs: number;
+  timeoutThinkingValidationMs?: number;
+  timeoutImpactAnalysisMs?: number;
+  timeoutAssumptionCheckerMs?: number;
+  timeoutDependencyMapperMs?: number;
+  timeoutThinkingOptimizerMs?: number;
 }
 
 export class ToolCallingService {
@@ -39,7 +39,43 @@ export class ToolCallingService {
   private toolRegistry: ToolRegistry;
 
   constructor(config: ToolCallingConfig) {
-    this.config = config;
+    // Apply defaults for missing optional config fields
+    this.config = {
+      ...config,
+      maxFileSizeKB: config.maxFileSizeKB ?? 500,
+      maxExecutionTimeSec: config.maxExecutionTimeSec ?? 30,
+      allowedFileExtensions: config.allowedFileExtensions ?? [
+        ".ts",
+        ".js",
+        ".tsx",
+        ".jsx",
+        ".json",
+        ".md",
+        ".txt",
+        ".env",
+        ".yml",
+        ".yaml",
+        ".toml",
+        ".xml",
+        ".html",
+        ".css",
+        ".scss",
+        ".py",
+        ".java",
+        ".go",
+        ".rs",
+        ".c",
+        ".cpp",
+        ".h",
+        ".sh",
+      ],
+      allowedCommands: config.allowedCommands ?? [],
+      timeoutThinkingValidationMs: config.timeoutThinkingValidationMs ?? 120000,
+      timeoutImpactAnalysisMs: config.timeoutImpactAnalysisMs ?? 90000,
+      timeoutAssumptionCheckerMs: config.timeoutAssumptionCheckerMs ?? 60000,
+      timeoutDependencyMapperMs: config.timeoutDependencyMapperMs ?? 90000,
+      timeoutThinkingOptimizerMs: config.timeoutThinkingOptimizerMs ?? 60000,
+    };
     this.toolRegistry = createToolRegistry();
   }
 
@@ -62,10 +98,10 @@ export class ToolCallingService {
 
     // Validate file extension
     const fileExt = this.getFileExtension(args.path);
-    if (!this.config.allowedFileExtensions.includes(fileExt)) {
+    if (!this.config.allowedFileExtensions!.includes(fileExt)) {
       return {
         success: false,
-        error: `File extension '${fileExt}' is not allowed. Allowed extensions: ${this.config.allowedFileExtensions.join(
+        error: `File extension '${fileExt}' is not allowed. Allowed extensions: ${this.config.allowedFileExtensions!.join(
           ", "
         )}`,
       };
@@ -77,14 +113,13 @@ export class ToolCallingService {
       // Check file size limit if content was successfully read
       if (result.success && result.content) {
         const fileSizeKB = Buffer.byteLength(result.content, "utf8") / 1024;
-        if (fileSizeKB > this.config.maxFileSizeKB) {
+        if (fileSizeKB > this.config.maxFileSizeKB!) {
           return {
             success: false,
             error: `File size (${fileSizeKB.toFixed(
               1
-            )}KB) exceeds maximum allowed size (${
-              this.config.maxFileSizeKB
-            }KB)`,
+            )}KB) exceeds maximum allowed size (${this.config
+              .maxFileSizeKB!}KB)`,
           };
         }
       }
@@ -106,9 +141,7 @@ export class ToolCallingService {
   /**
    * Read multiple files concurrently with per-file mode support
    */
-  async readMultipleFiles(
-    files: ReadFileRequest[]
-  ): Promise<{
+  async readMultipleFiles(files: ReadFileRequest[]): Promise<{
     success: boolean;
     results: Array<{ path: string; content?: string; error?: string }>;
     error?: string;
@@ -124,11 +157,13 @@ export class ToolCallingService {
     // Validate file extensions for all files
     for (const fileRequest of files) {
       const fileExt = this.getFileExtension(fileRequest.path);
-      if (!this.config.allowedFileExtensions.includes(fileExt)) {
+      if (!this.config.allowedFileExtensions!.includes(fileExt)) {
         return {
           success: false,
           results: [],
-          error: `File extension '${fileExt}' is not allowed for ${fileRequest.path}. Allowed extensions: ${this.config.allowedFileExtensions.join(
+          error: `File extension '${fileExt}' is not allowed for ${
+            fileRequest.path
+          }. Allowed extensions: ${this.config.allowedFileExtensions!.join(
             ", "
           )}`,
         };
@@ -141,13 +176,13 @@ export class ToolCallingService {
       // Check file size limits for all results
       for (const fileResult of result.results) {
         if (fileResult.content) {
-          const fileSizeKB = Buffer.byteLength(fileResult.content, "utf8") / 1024;
-          if (fileSizeKB > this.config.maxFileSizeKB) {
+          const fileSizeKB =
+            Buffer.byteLength(fileResult.content, "utf8") / 1024;
+          if (fileSizeKB > this.config.maxFileSizeKB!) {
             fileResult.error = `File size (${fileSizeKB.toFixed(
               1
-            )}KB) exceeds maximum allowed size (${
-              this.config.maxFileSizeKB
-            }KB)`;
+            )}KB) exceeds maximum allowed size (${this.config
+              .maxFileSizeKB!}KB)`;
             fileResult.content = undefined;
           }
         }
@@ -291,22 +326,22 @@ export class ToolCallingService {
     }
 
     // Validate command against allowed commands list
-    const isAllowed = this.config.allowedCommands.some((allowedCmd) =>
+    const isAllowed = this.config.allowedCommands!.some((allowedCmd) =>
       command.startsWith(allowedCmd)
     );
 
     if (!isAllowed) {
       return {
         success: false,
-        error: `Command not allowed: "${command}". Allowed commands start with: ${this.config.allowedCommands
-          .slice(0, 10)
-          .join(", ")}${this.config.allowedCommands.length > 10 ? "..." : ""}`,
+        error: `Command not allowed: "${command}". Allowed commands start with: ${this.config
+          .allowedCommands!.slice(0, 10)
+          .join(", ")}${this.config.allowedCommands!.length > 10 ? "..." : ""}`,
       };
     }
 
     try {
       const cwd = workingDirectory ? resolve(workingDirectory) : process.cwd();
-      const timeoutMs = this.config.maxExecutionTimeSec * 1000; // Convert to milliseconds
+      const timeoutMs = this.config.maxExecutionTimeSec! * 1000; // Convert to milliseconds
 
       const result = await execAsync(command, {
         cwd,
@@ -351,9 +386,7 @@ export class ToolCallingService {
   /**
    * Edit file with advanced matching strategies (enhanced version)
    */
-  async editFile(
-    args: EditFileArgs
-  ): Promise<{
+  async editFile(args: EditFileArgs): Promise<{
     success: boolean;
     diff?: string;
     changes?: {
@@ -366,17 +399,16 @@ export class ToolCallingService {
     if (!this.config.replaceInFile.enabled) {
       return {
         success: false,
-        error:
-          "File editing is disabled in configuration for security reasons",
+        error: "File editing is disabled in configuration for security reasons",
       };
     }
 
     // Validate file extension
     const fileExt = this.getFileExtension(args.path);
-    if (!this.config.allowedFileExtensions.includes(fileExt)) {
+    if (!this.config.allowedFileExtensions!.includes(fileExt)) {
       return {
         success: false,
-        error: `File extension '${fileExt}' is not allowed for editing. Allowed extensions: ${this.config.allowedFileExtensions.join(
+        error: `File extension '${fileExt}' is not allowed for editing. Allowed extensions: ${this.config.allowedFileExtensions!.join(
           ", "
         )}`,
       };
@@ -410,7 +442,9 @@ export class ToolCallingService {
   ): Promise<{ success: boolean; error?: string }> {
     const result = await this.editFile({
       path: filePath,
-      edits: [{ oldText: oldString, newText: newString, expectedOccurrences: 1 }],
+      edits: [
+        { oldText: oldString, newText: newString, expectedOccurrences: 1 },
+      ],
       matchingStrategy: "exact",
       dryRun: false,
       failOnAmbiguous: true,
