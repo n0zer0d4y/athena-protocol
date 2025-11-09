@@ -562,18 +562,72 @@ export class ThinkingValidator {
       throw new Error("Tool calling service not available");
     }
 
-    const { projectRoot, filesToAnalyze, workingDirectory } = projectContext;
+    const { projectRoot, filesToAnalyze, workingDirectory, analysisTargets } = projectContext;
+    
+    // NEW: Check if client provides targeted analysis
+    if (analysisTargets && analysisTargets.length > 0) {
+      return await this.analyzeTargetedSections(
+        analysisTargets,
+        projectRoot,
+        workingDirectory
+      );
+    }
+
+    // FALLBACK: Use enhanced generic analysis with filesToAnalyze
     const analysis: string[] = [];
     let filesAnalyzed = 0;
     const toolsUsed: string[] = [];
 
-    // Analyze key files using grep-first workflow
+    // Analyze key files using CONCURRENT reading with modes
     if (filesToAnalyze && filesToAnalyze.length > 0) {
       analysis.push("## Key Files Analysis");
       analysis.push(
-        "*(Analysis performed using grep-first workflow for efficiency)*"
+        "*(Analysis performed using concurrent file reading for efficiency)*"
       );
 
+      // ENHANCED: Prepare concurrent read requests with head mode (first 100 lines)
+      const fileRequests = filesToAnalyze.map((filePath) => ({
+        path: isAbsolute(filePath)
+          ? filePath
+          : workingDirectory
+            ? resolve(workingDirectory, filePath)
+            : resolve(projectRoot, filePath),
+        mode: "head" as const,
+        lines: 100, // Read first 100 lines for overview
+      }));
+
+      // CONCURRENT reading (much faster than sequential)
+      const readResults = await this.toolCallingService.readMultipleFiles(fileRequests);
+      toolsUsed.push("readMultipleFiles");
+
+      if (readResults.success) {
+        filesAnalyzed = readResults.results.filter((r) => r.content).length;
+
+        for (let i = 0; i < filesToAnalyze.length; i++) {
+          const filePath = filesToAnalyze[i];
+          const result = readResults.results[i];
+
+          analysis.push(`### ${filePath}`);
+
+          if (result.content) {
+            const lines = result.content.split("\n");
+            analysis.push("**File Content (first 100 lines):**");
+            analysis.push("```");
+            analysis.push(result.content);
+            analysis.push("```");
+
+            if (lines.length >= 100) {
+              analysis.push(`*(File has more content, showing first 100 lines)*`);
+            }
+          } else {
+            analysis.push(`Failed to read file: ${result.error}`);
+          }
+        }
+      } else {
+        analysis.push(`Failed to read files: ${readResults.error}`);
+      }
+
+      // LEGACY: Still use grep for pattern discovery (keeping for backward compat)
       for (const filePath of filesToAnalyze) {
         try {
           // Properly handle both absolute and relative paths
@@ -1030,5 +1084,105 @@ ${
         persistentData[sessionId].lastUpdated ||
         new Date().toISOString(),
     }));
+  }
+
+  /**
+   * NEW: Analyze targeted sections specified by the client
+   * This is the smart client implementation - client specifies exact sections
+   */
+  private async analyzeTargetedSections(
+    targets: import("../types/thinking-validation-types.js").AnalysisTarget[],
+    projectRoot: string,
+    workingDirectory?: string
+  ): Promise<{
+    content: string;
+    fileAnalysisPerformed: boolean;
+    filesAnalyzed: number;
+    toolsUsed: string[];
+  }> {
+    const analysis: string[] = [];
+    const filesProcessed = new Set<string>();
+    const toolsUsed = ["readMultipleFiles"];
+
+    analysis.push("## Targeted Code Analysis");
+    analysis.push("*(Client-specified code sections with mode support)*\n");
+
+    // Group targets by priority
+    const criticalTargets = targets.filter((t) => t.priority === "critical");
+    const importantTargets = targets.filter(
+      (t) => t.priority === "important" || !t.priority
+    );
+    const supplementaryTargets = targets.filter(
+      (t) => t.priority === "supplementary"
+    );
+
+    // Process in priority order
+    for (const targetGroup of [
+      criticalTargets,
+      importantTargets,
+      supplementaryTargets,
+    ]) {
+      if (targetGroup.length === 0) continue;
+
+      // Convert to read requests
+      const fileRequests = targetGroup.map((target) => {
+        const fullPath = isAbsolute(target.file)
+          ? target.file
+          : workingDirectory
+            ? resolve(workingDirectory, target.file)
+            : resolve(projectRoot, target.file);
+
+        return {
+          path: fullPath,
+          mode: target.mode || "range",
+          lines: target.lines,
+          startLine: target.startLine,
+          endLine: target.endLine,
+        };
+      });
+
+      // Read all files in this priority group concurrently
+      const readResults = await this.toolCallingService!.readMultipleFiles(
+        fileRequests
+      );
+
+      if (readResults.success) {
+        for (let i = 0; i < targetGroup.length; i++) {
+          const target = targetGroup[i];
+          const result = readResults.results[i];
+
+          filesProcessed.add(target.file);
+
+          // Format section header
+          const priorityLabel =
+            target.priority === "critical" ? " [CRITICAL]" : "";
+
+          analysis.push(`### ${target.file}${priorityLabel}`);
+
+          if (target.mode || target.startLine) {
+            const modeInfo = target.mode
+              ? `Mode: ${target.mode}${target.lines ? ` (${target.lines} lines)` : ""
+              }`
+              : `Lines ${target.startLine}-${target.endLine}`;
+            analysis.push(`**${modeInfo}**`);
+          }
+
+          if (result.content) {
+            analysis.push("```");
+            analysis.push(result.content);
+            analysis.push("```\n");
+          } else {
+            analysis.push(`Failed to read section: ${result.error}\n`);
+          }
+        }
+      }
+    }
+
+    return {
+      content: analysis.join("\n"),
+      fileAnalysisPerformed: true,
+      filesAnalyzed: filesProcessed.size,
+      toolsUsed,
+    };
   }
 }
