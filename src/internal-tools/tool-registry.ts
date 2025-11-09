@@ -25,6 +25,10 @@ export interface ToolRegistry {
   readMultipleFiles: (args: any) => Promise<any>;
   editFile: (args: any) => Promise<any>;
   
+  // Backward compatibility aliases
+  readManyFiles: (args: any) => Promise<any>;
+  replaceInFile: (args: any) => Promise<any>;
+  
   // Legacy tools
   writeFile: (args: any) => Promise<any>;
   listFiles: (args: any) => Promise<any>;
@@ -41,6 +45,10 @@ export function createToolRegistry(): ToolRegistry {
     readFile: readFileTool,
     readMultipleFiles: readMultipleFilesTool,
     editFile: editFileTool,
+    
+    // Backward compatibility aliases
+    readManyFiles: readMultipleFilesTool, // Alias for backward compatibility
+    replaceInFile: editFileTool, // Alias for backward compatibility
     
     // Legacy tools
     writeFile: writeFileTool,
