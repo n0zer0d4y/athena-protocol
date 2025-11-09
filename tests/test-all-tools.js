@@ -2,7 +2,7 @@
  * Comprehensive test script to verify all internal tools work correctly
  */
 
-import { createToolRegistry } from './src/mcp-server/internal-tools/tool-registry.js';
+import { createToolRegistry } from '../dist/internal-tools/tool-registry.js';
 import { promises as fs } from 'fs';
 import { join } from 'path';
 
