@@ -209,14 +209,51 @@ Focused Outputs:
             type: "array",
             items: { type: "string" },
             description:
-              "Array of absolute file paths to analyze (must be full paths, not relative)",
+              "Array of absolute file paths to analyze (backward compatible)",
           },
           workingDirectory: {
             type: "string",
             description: "Current working directory (optional)",
           },
+          analysisTargets: {
+            type: "array",
+            description:
+              "Specific code sections to analyze with mode support (NEW: client-driven targeting)",
+            items: {
+              type: "object",
+              properties: {
+                file: {
+                  type: "string",
+                  description: "File path (relative or absolute)",
+                },
+                mode: {
+                  type: "string",
+                  enum: ["full", "head", "tail", "range"],
+                  description: "Read mode for this file",
+                },
+                lines: {
+                  type: "number",
+                  description: "Number of lines (for head/tail modes)",
+                },
+                startLine: {
+                  type: "number",
+                  description: "Start line number (1-indexed, for range mode)",
+                },
+                endLine: {
+                  type: "number",
+                  description: "End line number (1-indexed, for range mode)",
+                },
+                priority: {
+                  type: "string",
+                  enum: ["critical", "important", "supplementary"],
+                  description: "Priority for analysis focus",
+                },
+              },
+              required: ["file"],
+            },
+          },
         },
-        required: ["projectRoot", "filesToAnalyze"],
+        required: ["projectRoot"],
       },
       projectBackground: {
         type: "string",
@@ -342,14 +379,51 @@ Focused Outputs:
             type: "array",
             items: { type: "string" },
             description:
-              "Array of absolute file paths to analyze (must be full paths, not relative)",
+              "Array of absolute file paths to analyze (backward compatible)",
           },
           workingDirectory: {
             type: "string",
             description: "Current working directory (optional)",
           },
+          analysisTargets: {
+            type: "array",
+            description:
+              "Specific code sections to analyze with mode support (NEW: client-driven targeting)",
+            items: {
+              type: "object",
+              properties: {
+                file: {
+                  type: "string",
+                  description: "File path (relative or absolute)",
+                },
+                mode: {
+                  type: "string",
+                  enum: ["full", "head", "tail", "range"],
+                  description: "Read mode for this file",
+                },
+                lines: {
+                  type: "number",
+                  description: "Number of lines (for head/tail modes)",
+                },
+                startLine: {
+                  type: "number",
+                  description: "Start line number (1-indexed, for range mode)",
+                },
+                endLine: {
+                  type: "number",
+                  description: "End line number (1-indexed, for range mode)",
+                },
+                priority: {
+                  type: "string",
+                  enum: ["critical", "important", "supplementary"],
+                  description: "Priority for analysis focus",
+                },
+              },
+              required: ["file"],
+            },
+          },
         },
-        required: ["projectRoot", "filesToAnalyze"],
+        required: ["projectRoot"],
       },
       projectBackground: {
         type: "string",
@@ -446,14 +520,51 @@ Focused Outputs:
             type: "array",
             items: { type: "string" },
             description:
-              "Array of absolute file paths to analyze (must be full paths, not relative)",
+              "Array of absolute file paths to analyze (backward compatible)",
           },
           workingDirectory: {
             type: "string",
             description: "Current working directory (optional)",
           },
+          analysisTargets: {
+            type: "array",
+            description:
+              "Specific code sections to analyze with mode support (NEW: client-driven targeting)",
+            items: {
+              type: "object",
+              properties: {
+                file: {
+                  type: "string",
+                  description: "File path (relative or absolute)",
+                },
+                mode: {
+                  type: "string",
+                  enum: ["full", "head", "tail", "range"],
+                  description: "Read mode for this file",
+                },
+                lines: {
+                  type: "number",
+                  description: "Number of lines (for head/tail modes)",
+                },
+                startLine: {
+                  type: "number",
+                  description: "Start line number (1-indexed, for range mode)",
+                },
+                endLine: {
+                  type: "number",
+                  description: "End line number (1-indexed, for range mode)",
+                },
+                priority: {
+                  type: "string",
+                  enum: ["critical", "important", "supplementary"],
+                  description: "Priority for analysis focus",
+                },
+              },
+              required: ["file"],
+            },
+          },
         },
-        required: ["projectRoot", "filesToAnalyze"],
+        required: ["projectRoot"],
       },
       projectBackground: {
         type: "string",
@@ -553,14 +664,51 @@ Focused Outputs:
             type: "array",
             items: { type: "string" },
             description:
-              "Array of absolute file paths to analyze (must be full paths, not relative)",
+              "Array of absolute file paths to analyze (backward compatible)",
           },
           workingDirectory: {
             type: "string",
             description: "Current working directory (optional)",
           },
+          analysisTargets: {
+            type: "array",
+            description:
+              "Specific code sections to analyze with mode support (NEW: client-driven targeting)",
+            items: {
+              type: "object",
+              properties: {
+                file: {
+                  type: "string",
+                  description: "File path (relative or absolute)",
+                },
+                mode: {
+                  type: "string",
+                  enum: ["full", "head", "tail", "range"],
+                  description: "Read mode for this file",
+                },
+                lines: {
+                  type: "number",
+                  description: "Number of lines (for head/tail modes)",
+                },
+                startLine: {
+                  type: "number",
+                  description: "Start line number (1-indexed, for range mode)",
+                },
+                endLine: {
+                  type: "number",
+                  description: "End line number (1-indexed, for range mode)",
+                },
+                priority: {
+                  type: "string",
+                  enum: ["critical", "important", "supplementary"],
+                  description: "Priority for analysis focus",
+                },
+              },
+              required: ["file"],
+            },
+          },
         },
-        required: ["projectRoot", "filesToAnalyze"],
+        required: ["projectRoot"],
       },
       projectBackground: {
         type: "string",
@@ -649,14 +797,51 @@ Focused Outputs:
             type: "array",
             items: { type: "string" },
             description:
-              "Array of absolute file paths to analyze (must be full paths, not relative)",
+              "Array of absolute file paths to analyze (backward compatible)",
           },
           workingDirectory: {
             type: "string",
             description: "Current working directory (optional)",
           },
+          analysisTargets: {
+            type: "array",
+            description:
+              "Specific code sections to analyze with mode support (NEW: client-driven targeting)",
+            items: {
+              type: "object",
+              properties: {
+                file: {
+                  type: "string",
+                  description: "File path (relative or absolute)",
+                },
+                mode: {
+                  type: "string",
+                  enum: ["full", "head", "tail", "range"],
+                  description: "Read mode for this file",
+                },
+                lines: {
+                  type: "number",
+                  description: "Number of lines (for head/tail modes)",
+                },
+                startLine: {
+                  type: "number",
+                  description: "Start line number (1-indexed, for range mode)",
+                },
+                endLine: {
+                  type: "number",
+                  description: "End line number (1-indexed, for range mode)",
+                },
+                priority: {
+                  type: "string",
+                  enum: ["critical", "important", "supplementary"],
+                  description: "Priority for analysis focus",
+                },
+              },
+              required: ["file"],
+            },
+          },
         },
-        required: ["projectRoot", "filesToAnalyze"],
+        required: ["projectRoot"],
       },
       projectBackground: {
         type: "string",
@@ -733,21 +918,20 @@ function validateThinkingValidationParams(args: any): {
       "Missing or invalid required parameter: 'projectContext.projectRoot' must be a string"
     );
   }
-  if (
-    !args.projectContext.filesToAnalyze ||
-    !Array.isArray(args.projectContext.filesToAnalyze)
-  ) {
-    throw new ToolParameterError(
-      "Missing or invalid required parameter: 'projectContext.filesToAnalyze' must be an array"
-    );
-  }
-
-  // Validate that all files in the array are valid strings
-  for (const file of args.projectContext.filesToAnalyze) {
-    if (typeof file !== "string" || file.trim().length === 0) {
+  // Validate filesToAnalyze if provided (now optional)
+  if (args.projectContext.filesToAnalyze !== undefined) {
+    if (!Array.isArray(args.projectContext.filesToAnalyze)) {
       throw new ToolParameterError(
-        "Invalid filesToAnalyze entry: all entries must be non-empty strings representing file paths"
+        "Invalid parameter: 'projectContext.filesToAnalyze' must be an array if provided"
       );
+    }
+    // Validate that all files in the array are valid strings
+    for (const file of args.projectContext.filesToAnalyze) {
+      if (typeof file !== "string" || file.trim().length === 0) {
+        throw new ToolParameterError(
+          "Invalid filesToAnalyze entry: all entries must be non-empty strings representing file paths"
+        );
+      }
     }
   }
 
@@ -800,21 +984,20 @@ function validateImpactAnalysisParams(args: any): {
       "Missing or invalid required parameter: 'projectContext.projectRoot' must be a string"
     );
   }
-  if (
-    !args.projectContext.filesToAnalyze ||
-    !Array.isArray(args.projectContext.filesToAnalyze)
-  ) {
-    throw new ToolParameterError(
-      "Missing or invalid required parameter: 'projectContext.filesToAnalyze' must be an array"
-    );
-  }
-
-  // Validate that all files in the array are valid strings
-  for (const file of args.projectContext.filesToAnalyze) {
-    if (typeof file !== "string" || file.trim().length === 0) {
+  // Validate filesToAnalyze if provided (now optional)
+  if (args.projectContext.filesToAnalyze !== undefined) {
+    if (!Array.isArray(args.projectContext.filesToAnalyze)) {
       throw new ToolParameterError(
-        "Invalid filesToAnalyze entry: all entries must be non-empty strings representing file paths"
+        "Invalid parameter: 'projectContext.filesToAnalyze' must be an array if provided"
       );
+    }
+    // Validate that all files in the array are valid strings
+    for (const file of args.projectContext.filesToAnalyze) {
+      if (typeof file !== "string" || file.trim().length === 0) {
+        throw new ToolParameterError(
+          "Invalid filesToAnalyze entry: all entries must be non-empty strings representing file paths"
+        );
+      }
     }
   }
 
@@ -884,21 +1067,20 @@ function validateAssumptionCheckerParams(args: any): {
       "Missing or invalid required parameter: 'projectContext.projectRoot' must be a string"
     );
   }
-  if (
-    !args.projectContext.filesToAnalyze ||
-    !Array.isArray(args.projectContext.filesToAnalyze)
-  ) {
-    throw new ToolParameterError(
-      "Missing or invalid required parameter: 'projectContext.filesToAnalyze' must be an array"
-    );
-  }
-
-  // Validate that all files in the array are valid strings
-  for (const file of args.projectContext.filesToAnalyze) {
-    if (typeof file !== "string" || file.trim().length === 0) {
+  // Validate filesToAnalyze if provided (now optional)
+  if (args.projectContext.filesToAnalyze !== undefined) {
+    if (!Array.isArray(args.projectContext.filesToAnalyze)) {
       throw new ToolParameterError(
-        "Invalid filesToAnalyze entry: all entries must be non-empty strings representing file paths"
+        "Invalid parameter: 'projectContext.filesToAnalyze' must be an array if provided"
       );
+    }
+    // Validate that all files in the array are valid strings
+    for (const file of args.projectContext.filesToAnalyze) {
+      if (typeof file !== "string" || file.trim().length === 0) {
+        throw new ToolParameterError(
+          "Invalid filesToAnalyze entry: all entries must be non-empty strings representing file paths"
+        );
+      }
     }
   }
 
@@ -948,21 +1130,20 @@ function validateDependencyMapperParams(args: any): {
       "Missing or invalid required parameter: 'projectContext.projectRoot' must be a string"
     );
   }
-  if (
-    !args.projectContext.filesToAnalyze ||
-    !Array.isArray(args.projectContext.filesToAnalyze)
-  ) {
-    throw new ToolParameterError(
-      "Missing or invalid required parameter: 'projectContext.filesToAnalyze' must be an array"
-    );
-  }
-
-  // Validate that all files in the array are valid strings
-  for (const file of args.projectContext.filesToAnalyze) {
-    if (typeof file !== "string" || file.trim().length === 0) {
+  // Validate filesToAnalyze if provided (now optional)
+  if (args.projectContext.filesToAnalyze !== undefined) {
+    if (!Array.isArray(args.projectContext.filesToAnalyze)) {
       throw new ToolParameterError(
-        "Invalid filesToAnalyze entry: all entries must be non-empty strings representing file paths"
+        "Invalid parameter: 'projectContext.filesToAnalyze' must be an array if provided"
       );
+    }
+    // Validate that all files in the array are valid strings
+    for (const file of args.projectContext.filesToAnalyze) {
+      if (typeof file !== "string" || file.trim().length === 0) {
+        throw new ToolParameterError(
+          "Invalid filesToAnalyze entry: all entries must be non-empty strings representing file paths"
+        );
+      }
     }
   }
 
@@ -1033,21 +1214,20 @@ function validateThinkingOptimizerParams(args: any): {
       "Missing or invalid required parameter: 'projectContext.projectRoot' must be a string"
     );
   }
-  if (
-    !args.projectContext.filesToAnalyze ||
-    !Array.isArray(args.projectContext.filesToAnalyze)
-  ) {
-    throw new ToolParameterError(
-      "Missing or invalid required parameter: 'projectContext.filesToAnalyze' must be an array"
-    );
-  }
-
-  // Validate that all files in the array are valid strings
-  for (const file of args.projectContext.filesToAnalyze) {
-    if (typeof file !== "string" || file.trim().length === 0) {
+  // Validate filesToAnalyze if provided (now optional)
+  if (args.projectContext.filesToAnalyze !== undefined) {
+    if (!Array.isArray(args.projectContext.filesToAnalyze)) {
       throw new ToolParameterError(
-        "Invalid filesToAnalyze entry: all entries must be non-empty strings representing file paths"
+        "Invalid parameter: 'projectContext.filesToAnalyze' must be an array if provided"
       );
+    }
+    // Validate that all files in the array are valid strings
+    for (const file of args.projectContext.filesToAnalyze) {
+      if (typeof file !== "string" || file.trim().length === 0) {
+        throw new ToolParameterError(
+          "Invalid filesToAnalyze entry: all entries must be non-empty strings representing file paths"
+        );
+      }
     }
   }
 
