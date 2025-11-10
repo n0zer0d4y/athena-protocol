@@ -936,15 +936,15 @@ class UnifiedConfigManager {
     this.providerConfigs.clear();
 
     // Load configuration for all supported providers
-    console.log(
+    console.error(
       `[DEBUG] Loading configs for providers: ${SUPPORTED_PROVIDERS.join(", ")}`
     );
     for (const providerName of SUPPORTED_PROVIDERS) {
-      console.log(`[DEBUG] Loading config for ${providerName}...`);
+      console.error(`[DEBUG] Loading config for ${providerName}...`);
       try {
         const config = this.loadProviderConfiguration(providerName);
         this.providerConfigs.set(providerName, Object.freeze(config));
-        console.log(`[DEBUG] Successfully loaded config for ${providerName}`);
+        console.error(`[DEBUG] Successfully loaded config for ${providerName}`);
       } catch (error) {
         // Skip providers with invalid configuration in non-strict mode
         if (process.env.CONFIG_STRICT === "1") {
@@ -1004,7 +1004,7 @@ class UnifiedConfigManager {
     };
 
     // Add GPT-5 specific parameters for providers that support reasoning models
-    console.log(
+    console.error(
       `[DEBUG] Checking GPT-5 support for ${providerName}: ${providerSupportsFeature(
         providerName,
         "GPT5_REASONING"
@@ -1014,12 +1014,12 @@ class UnifiedConfigManager {
       providerName,
       "GPT5_REASONING"
     );
-    console.log(
+    console.error(
       `[DEBUG] providerSupportsFeature(${providerName}, "GPT5_REASONING") = ${supportsGPT5}`
     );
-    console.log(`[DEBUG] About to enter GPT-5 if block for ${providerName}`);
+    console.error(`[DEBUG] About to enter GPT-5 if block for ${providerName}`);
     if (supportsGPT5) {
-      console.log(`[DEBUG] Loading GPT-5 config for ${providerName}`);
+      console.error(`[DEBUG] Loading GPT-5 config for ${providerName}`);
       try {
         const gptConfig = config as ProviderConfiguration & {
           maxCompletionTokens?: number;
@@ -1031,14 +1031,14 @@ class UnifiedConfigManager {
         if (maxCompletionTokens !== null) {
           gptConfig.maxCompletionTokens = maxCompletionTokens;
         }
-        console.log(
+        console.error(
           `[DEBUG] GPT-5 config for ${providerName}: maxCompletionTokens=${gptConfig.maxCompletionTokens}`
         );
 
         const verbosity = getVerbosity();
         if (verbosity && ["low", "medium", "high"].includes(verbosity)) {
           gptConfig.verbosity = verbosity as "low" | "medium" | "high";
-          console.log(
+          console.error(
             `[DEBUG] GPT-5 config for ${providerName}: verbosity=${gptConfig.verbosity}`
           );
         }
@@ -1053,16 +1053,16 @@ class UnifiedConfigManager {
             | "low"
             | "medium"
             | "high";
-          console.log(
+          console.error(
             `[DEBUG] GPT-5 config for ${providerName}: reasoningEffort=${gptConfig.reasoningEffort}`
           );
         }
 
-        console.log(`[DEBUG] Returning GPT-5 config for ${providerName}`);
+        console.error(`[DEBUG] Returning GPT-5 config for ${providerName}`);
         return gptConfig;
       } catch (error) {
         // GPT-5 parameters are optional, return base config
-        console.log(
+        console.error(
           `[DEBUG] Error loading GPT-5 config for ${providerName}:`,
           (error as Error).message
         );
@@ -1077,19 +1077,19 @@ class UnifiedConfigManager {
    * Get unified configuration for a provider
    */
   getProviderConfiguration(providerName: string): ProviderConfiguration | null {
-    console.log(`[DEBUG] getProviderConfiguration called for ${providerName}`);
-    console.log(`[DEBUG] isEnabled(): ${this.isEnabled()}`);
+    console.error(`[DEBUG] getProviderConfiguration called for ${providerName}`);
+    console.error(`[DEBUG] isEnabled(): ${this.isEnabled()}`);
 
     if (!this.isEnabled()) {
       // Feature flag disabled, fall back to legacy approach
-      console.log(`[DEBUG] Unified config disabled, returning null`);
+      console.error(`[DEBUG] Unified config disabled, returning null`);
       return null;
     }
 
-    console.log(`[DEBUG] Initializing unified config...`);
+    console.error(`[DEBUG] Initializing unified config...`);
     this.initialize();
     const config = this.providerConfigs.get(providerName) || null;
-    console.log(`[DEBUG] Returning config for ${providerName}:`, !!config);
+    console.error(`[DEBUG] Returning config for ${providerName}:`, !!config);
     return config;
   }
 
@@ -1798,9 +1798,9 @@ export function formatValidationResults(result: ValidationResult): string {
   let output = "";
 
   if (result.isValid) {
-    output += "✅ **Configuration Validation: PASSED**\n\n";
+    output += "[success] **Configuration Validation: PASSED**\n\n";
     if (result.warnings.length > 0) {
-      output += `⚠️  **${result.warnings.length} Warning(s) Found:**\n\n`;
+      output += `[warning] **${result.warnings.length} Warning(s) Found:**\n\n`;
       result.warnings.forEach((warning, index) => {
         output += `${index + 1}. **${
           warning.provider ? `[${warning.provider}] ` : ""
@@ -1808,8 +1808,8 @@ export function formatValidationResults(result: ValidationResult): string {
       });
     }
   } else {
-    output += "❌ **Configuration Validation: FAILED**\n\n";
-    output += `🚫 **${result.errors.length} Error(s) Found:**\n\n`;
+    output += "[error] **Configuration Validation: FAILED**\n\n";
+    output += `[error] **${result.errors.length} Error(s) Found:**\n\n`;
 
     result.errors.forEach((error, index) => {
       output += `${index + 1}. **${
@@ -1818,7 +1818,7 @@ export function formatValidationResults(result: ValidationResult): string {
     });
 
     if (result.warnings.length > 0) {
-      output += `\n⚠️  **${result.warnings.length} Warning(s) Found:**\n\n`;
+      output += `\n[warning] **${result.warnings.length} Warning(s) Found:**\n\n`;
       result.warnings.forEach((warning, index) => {
         output += `${index + 1}. **${
           warning.provider ? `[${warning.provider}] ` : ""
@@ -2103,35 +2103,35 @@ export function validateConfiguration(): LegacyValidationResult {
  * Print validation results to console
  */
 export function printValidationResults(result: LegacyValidationResult): void {
-  console.log("\n🔍 Configuration Validation Results:");
-  console.log("=====================================");
+  console.error("\nConfiguration Validation Results:");
+  console.error("=====================================");
 
   if (result.valid) {
-    console.log("✅ Configuration is valid");
+    console.error("Configuration is valid");
   } else {
-    console.log("❌ Configuration has issues");
+    console.error("Configuration has issues");
   }
 
   if (result.issues.length === 0) {
-    console.log("No issues found.");
+    console.error("No issues found.");
   } else {
     result.issues.forEach((issue, index) => {
       const icon =
-        issue.type === "error" ? "❌" : issue.type === "warning" ? "⚠️" : "ℹ️";
-      console.log(`${icon} ${issue.message}`);
+        issue.type === "error" ? "[error]" : issue.type === "warning" ? "[warning]" : "[info]";
+      console.error(`${icon} ${issue.message}`);
       if (issue.field) {
-        console.log(`   Field: ${issue.field}`);
+        console.error(`   Field: ${issue.field}`);
       }
       if (issue.suggestion) {
-        console.log(`   Suggestion: ${issue.suggestion}`);
+        console.error(`   Suggestion: ${issue.suggestion}`);
       }
       if (index < result.issues.length - 1) {
-        console.log("");
+        console.error("");
       }
     });
   }
 
-  console.log("=====================================\n");
+  console.error("=====================================\n");
 }
 
 // ==========================================
@@ -2460,18 +2460,18 @@ export function validateToolCallingConfig(config: ToolCallingConfig): {
 
   // Security warnings for dangerous operations
   if (config.writeToFile.enabled) {
-    console.warn(
-      "⚠️  WARNING: File writing is enabled - this poses security risks"
+    console.error(
+      "[warning] WARNING: File writing is enabled - this poses security risks"
     );
   }
   if (config.replaceInFile.enabled) {
-    console.warn(
-      "⚠️  WARNING: File replacement is enabled - this poses security risks"
+    console.error(
+      "[warning] WARNING: File replacement is enabled - this poses security risks"
     );
   }
   if (config.executeCommand.enabled) {
-    console.warn(
-      "⚠️  WARNING: Command execution is enabled - this poses CRITICAL security risks"
+    console.error(
+      "[warning] WARNING: Command execution is enabled - this poses CRITICAL security risks"
     );
   }
 

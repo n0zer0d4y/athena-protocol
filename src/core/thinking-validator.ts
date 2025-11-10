@@ -84,7 +84,7 @@ export class ThinkingValidator {
   async initialize(llmConfig: AthenaProtocolConfig): Promise<void> {
     // The unified-ai-service handles provider configuration automatically
     // No need for explicit connector initialization
-    console.log("Thinking Validator initialized successfully");
+    // Initialization complete (logging suppressed to prevent stdout contamination)
   }
 
   async validateThinking(
@@ -114,7 +114,7 @@ export class ThinkingValidator {
         filesAnalyzed = analysisResult.filesAnalyzed;
         toolsUsed = analysisResult.toolsUsed;
       } catch (error) {
-        console.warn("Failed to analyze project files:", error);
+        // Suppress logging to prevent stdout contamination
         projectAnalysis =
           "Project file analysis failed, proceeding with limited context.";
         fileAnalysisPerformed = false;
@@ -173,7 +173,7 @@ export class ThinkingValidator {
 
       return validationResult;
     } catch (error) {
-      console.error("Error during thinking validation:", error);
+      // Suppress error logging to prevent stdout contamination
       throw new Error(
         `Failed to validate thinking: ${(error as Error).message}`
       );
@@ -209,7 +209,7 @@ export class ThinkingValidator {
         filesAnalyzed = analysisResult.filesAnalyzed;
         toolsUsed = analysisResult.toolsUsed;
       } catch (error) {
-        console.warn("Failed to analyze project files:", error);
+        // Suppress logging to prevent stdout contamination
         projectAnalysis =
           "Project file analysis failed, proceeding with limited context.";
         fileAnalysisPerformed = false;
@@ -268,7 +268,7 @@ export class ThinkingValidator {
 
       return impactResult;
     } catch (error) {
-      console.error("Error during impact analysis:", error);
+      // Suppress error logging to prevent stdout contamination
       throw new Error(`Failed to analyze impact: ${(error as Error).message}`);
     }
   }
@@ -293,7 +293,7 @@ export class ThinkingValidator {
         filesAnalyzed = analysisResult.filesAnalyzed;
         toolsUsed = analysisResult.toolsUsed;
       } catch (error) {
-        console.warn("Failed to analyze project files:", error);
+        // Suppress logging to prevent stdout contamination
         projectAnalysis =
           "Project file analysis failed, proceeding with limited context.";
         fileAnalysisPerformed = false;
@@ -358,7 +358,7 @@ export class ThinkingValidator {
 
       return assumptionResult;
     } catch (error) {
-      console.error("Error during assumption checking:", error);
+      // Suppress error logging to prevent stdout contamination
       throw new Error(
         `Failed to check assumptions: ${(error as Error).message}`
       );
@@ -385,7 +385,7 @@ export class ThinkingValidator {
         filesAnalyzed = analysisResult.filesAnalyzed;
         toolsUsed = analysisResult.toolsUsed;
       } catch (error) {
-        console.warn("Failed to analyze project files:", error);
+        // Suppress logging to prevent stdout contamination
         projectAnalysis =
           "Project file analysis failed, proceeding with limited context.";
         fileAnalysisPerformed = false;
@@ -451,7 +451,7 @@ export class ThinkingValidator {
 
       return dependencyResult;
     } catch (error) {
-      console.error("Error during dependency mapping:", error);
+      // Suppress error logging to prevent stdout contamination
       throw new Error(
         `Failed to map dependencies: ${(error as Error).message}`
       );
@@ -478,7 +478,7 @@ export class ThinkingValidator {
         filesAnalyzed = analysisResult.filesAnalyzed;
         toolsUsed = analysisResult.toolsUsed;
       } catch (error) {
-        console.warn("Failed to analyze project files:", error);
+        // Suppress logging to prevent stdout contamination
         projectAnalysis =
           "Project file analysis failed, proceeding with limited context.";
         fileAnalysisPerformed = false;
@@ -545,7 +545,7 @@ export class ThinkingValidator {
 
       return optimizationResult;
     } catch (error) {
-      console.error("Error during thinking optimization:", error);
+      // Suppress error logging to prevent stdout contamination
       throw new Error(
         `Failed to optimize thinking: ${(error as Error).message}`
       );
@@ -891,7 +891,7 @@ ${
       }
       throw new Error("No valid JSON found in response");
     } catch (error) {
-      console.error("Error parsing thinking validation response:", error);
+      // Suppress error logging to prevent stdout contamination
       // Return a default response
       return {
         validation: {
@@ -916,7 +916,7 @@ ${
       }
       throw new Error("No valid JSON found in response");
     } catch (error) {
-      console.error("Error parsing impact analysis response:", error);
+      // Suppress error logging to prevent stdout contamination
       // Return a default response
       return {
         impacts: {
@@ -940,7 +940,7 @@ ${
       }
       throw new Error("No valid JSON found in response");
     } catch (error) {
-      console.error("Error parsing assumption checker response:", error);
+      // Suppress error logging to prevent stdout contamination
       // Return a default response
       return {
         validation: {
@@ -956,22 +956,15 @@ ${
     response: string
   ): DependencyMapperResponse {
     try {
-      console.log(
-        "[THINKING VALIDATOR DEBUG] Dependency mapper parsing response:",
-        response
-      );
+      // Debug logging suppressed to prevent stdout contamination
       // Try to extract JSON from the response
       const jsonMatch = response.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
-        console.log(
-          "[THINKING VALIDATOR DEBUG] Dependency mapper found JSON match:",
-          jsonMatch[0]
-        );
         return JSON.parse(jsonMatch[0]);
       }
       throw new Error("No valid JSON found in response");
     } catch (error) {
-      console.error("Error parsing dependency mapper response:", error);
+      // Suppress error logging to prevent stdout contamination
       // Return a default response
       return {
         dependencies: {
@@ -994,7 +987,7 @@ ${
       }
       throw new Error("No valid JSON found in response");
     } catch (error) {
-      console.error("Error parsing thinking optimizer response:", error);
+      // Suppress error logging to prevent stdout contamination
       // Return a default response
       return {
         optimizedStrategy: {

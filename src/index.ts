@@ -30,7 +30,7 @@ function loadEnvironmentVariables() {
     );
   }
 
-  console.error(`📄 Loading .env from: ${envPath}`);
+  console.error(`Loading .env from: ${envPath}`);
   const result = dotenv.config({ path: envPath });
 
   if (result.error) {
@@ -38,7 +38,7 @@ function loadEnvironmentVariables() {
   }
 
   console.error(
-    `✅ Successfully loaded .env with ${
+    `Successfully loaded .env with ${
       Object.keys(result.parsed || {}).length
     } variables`
   );
@@ -93,52 +93,8 @@ function getDefaultProviderDescription(): string {
 // Tool definitions for the Athena Protocol MCP Server
 const THINKING_VALIDATION_TOOL: Tool = {
   name: "thinking_validation",
-  description: `Validate the primary agent's thinking process with focused, essential information.
-
-Provider Override: Specify which LLM provider to use for this validation. Only providers with valid API keys will be accepted. ${getDefaultProviderDescription()}
-
-Streamlined Inputs:
-{
-  "thinking": "Brief explanation of the approach and reasoning",
-  "proposedChange": {
-    "description": "What will be changed",
-    "code": "The actual code change (before/after or new code)",
-    "files": ["file1.js", "file2.js"]
-  },
-  "context": {
-    "problem": "Brief problem description",
-    "techStack": "react|node|python etc",
-    "constraints": ["Key constraints like performance, backward compatibility"]
-  },
-  "urgency": "low|medium|high",
-  "projectContext": {
-    "projectRoot": "/absolute/path/to/project",
-    "filesToAnalyze": ["src/main.ts", "package.json"],
-    "workingDirectory": "/current/working/directory"
-  },
-  "projectBackground": "Brief description of the project, its purpose, technology stack, and key components to prevent hallucination"
-}
-
-Focused Outputs:
-{
-  "validation": {
-    "confidence": 85,
-    "goAhead": true,
-    "criticalIssues": [
-      {
-        "issue": "Specific problem identified",
-        "suggestion": "Concrete fix suggestion",
-        "priority": "high|medium|low"
-      }
-    ],
-    "recommendations": [
-      "1-3 specific, actionable recommendations"
-    ],
-    "testCases": [
-      "Key test cases that should be added"
-    ]
-  }
-}`,
+  description:
+    "Validate the primary agent's thinking process with focused, essential information. Returns validation analysis with confidence score, critical issues, recommendations, and test cases.",
   inputSchema: {
     type: "object",
     properties: {
@@ -274,57 +230,13 @@ Focused Outputs:
       "projectContext",
       "projectBackground",
     ],
-  }
+  },
 };
 
 const IMPACT_ANALYSIS_TOOL: Tool = {
   name: "impact_analysis",
-  description: `Quickly identify key impacts of proposed changes.
-
-Provider Override: Specify which LLM provider to use for this analysis. Only providers with valid API keys will be accepted. ${getDefaultProviderDescription()}
-
-Streamlined Inputs:
-{
-  "change": {
-    "description": "What is being changed",
-    "code": "The code change",
-    "files": ["affected files"]
-  },
-  "systemContext": {
-    "architecture": "Brief architecture description",
-    "keyDependencies": ["Service1", "Component2", "API3"]
-  },
-  "projectContext": {
-    "projectRoot": "/absolute/path/to/project",
-    "filesToAnalyze": ["src/main.ts", "package.json"],
-    "workingDirectory": "/current/working/directory"
-  },
-  "projectBackground": "Brief description of the project, its purpose, technology stack, and key components to prevent hallucination"
-}
-
-Focused Outputs:
-{
-  "impacts": {
-    "overallRisk": "low|medium|high",
-    "affectedAreas": [
-      {
-        "area": "UserProfile component",
-        "impact": "Potential null reference errors",
-        "mitigation": "Add null checks"
-      }
-    ],
-    "cascadingRisks": [
-      {
-        "risk": "Service X may be affected",
-        "probability": "low|medium|high",
-        "action": "Test integration with Service X"
-      }
-    ],
-    "quickTests": [
-      "Essential tests to run before deployment"
-    ]
-  }
-}`,
+  description:
+    "Quickly identify key impacts of proposed changes. Returns impact analysis with overall risk assessment, affected areas, cascading risks, and essential tests.",
   inputSchema: {
     type: "object",
     properties: {
@@ -437,50 +349,13 @@ Focused Outputs:
       },
     },
     required: ["change", "projectContext", "projectBackground"],
-  }
+  },
 };
 
 const ASSUMPTION_CHECKER_TOOL: Tool = {
   name: "assumption_checker",
-  description: `Rapidly validate key assumptions without over-analysis.
-
-Provider Override: Specify which LLM provider to use for this validation. Only providers with valid API keys will be accepted. ${getDefaultProviderDescription()}
-
-Streamlined Inputs:
-{
-  "assumptions": [
-    "User object is always available",
-    "API response time < 200ms",
-    "Database connection is stable"
-  ],
-  "context": {
-    "component": "UserProfile",
-    "environment": "production"
-  },
-  "projectContext": {
-    "projectRoot": "/absolute/path/to/project",
-    "filesToAnalyze": ["src/main.ts", "package.json"],
-    "workingDirectory": "/current/working/directory"
-  },
-  "projectBackground": "Brief description of the project, its purpose, technology stack, and key components to prevent hallucination"
-}
-
-Focused Outputs:
-{
-  "validation": {
-    "validAssumptions": ["User object is always available"],
-    "riskyAssumptions": [
-      {
-        "assumption": "API response time < 200ms",
-        "risk": "High traffic scenarios may exceed this",
-        "mitigation": "Add timeout handling"
-      }
-    ],
-    "quickVerifications": [
-      "Simple checks to validate assumptions"
-    ]
-  }
-}`,
+  description:
+    "Rapidly validate key assumptions without over-analysis. Returns validation results categorizing assumptions as valid or risky with mitigation strategies.",
   inputSchema: {
     type: "object",
     properties: {
@@ -578,52 +453,13 @@ Focused Outputs:
       },
     },
     required: ["assumptions", "context", "projectContext", "projectBackground"],
-  }
+  },
 };
 
 const DEPENDENCY_MAPPER_TOOL: Tool = {
   name: "dependency_mapper",
-  description: `Identify critical dependencies efficiently.
-
-Provider Override: Specify which LLM provider to use for this analysis. Only providers with valid API keys will be accepted. ${getDefaultProviderDescription()}
-
-Streamlined Inputs:
-{
-  "change": {
-    "description": "Brief change description",
-    "files": ["files being modified"],
-    "components": ["components being changed"]
-  },
-  "projectContext": {
-    "projectRoot": "/absolute/path/to/project",
-    "filesToAnalyze": ["src/main.ts", "package.json"],
-    "workingDirectory": "/current/working/directory"
-  },
-  "projectBackground": "Brief description of the project, its purpose, technology stack, and key components to prevent hallucination"
-}
-
-Focused Outputs:
-{
-  "dependencies": {
-    "critical": [
-      {
-        "dependency": "UserService.getUser",
-        "impact": "Breaking change will crash UserProfile",
-        "action": "Update UserService tests"
-      }
-    ],
-    "secondary": [
-      {
-        "dependency": "Analytics service",
-        "impact": "May lose tracking data",
-        "action": "Add error handling"
-      }
-    ],
-    "testFocus": [
-      "Key integration tests to run"
-    ]
-  }
-}`,
+  description:
+    "Identify critical dependencies efficiently. Returns dependency analysis categorizing critical and secondary dependencies with impact assessment and testing recommendations.",
   inputSchema: {
     type: "object",
     properties: {
@@ -722,43 +558,13 @@ Focused Outputs:
       },
     },
     required: ["change", "projectContext", "projectBackground"],
-  }
+  },
 };
 
 const THINKING_OPTIMIZER_TOOL: Tool = {
   name: "thinking_optimizer",
-  description: `Optimize thinking approach based on problem type.
-
-Provider Override: Specify which LLM provider to use for this optimization. Only providers with valid API keys will be accepted. ${getDefaultProviderDescription()}
-
-Streamlined Inputs:
-{
-  "problemType": "bug_fix|feature_impl|refactor",
-  "complexity": "simple|moderate|complex",
-  "timeConstraint": "tight|moderate|flexible",
-  "currentApproach": "Brief description of current thinking",
-  "projectContext": {
-    "projectRoot": "/absolute/path/to/project",
-    "filesToAnalyze": ["src/main.ts", "package.json"],
-    "workingDirectory": "/current/working/directory"
-  },
-  "projectBackground": "Brief description of the project, its purpose, technology stack, and key components to prevent hallucination"
-}
-
-Focused Outputs:
-{
-  "optimizedStrategy": {
-    "approach": "Recommended approach type",
-    "toolsToUse": ["thinking_validation", "impact_analysis"],
-    "timeAllocation": {
-      "thinking": "30%",
-      "implementation": "60%",
-      "testing": "10%"
-    },
-    "successProbability": 85,
-    "keyFocus": "What to focus on most"
-  }
-}`,
+  description:
+    "Optimize thinking approach based on problem type. Returns optimized strategy with recommended approach, tools to use, time allocation, and success probability.",
   inputSchema: {
     type: "object",
     properties: {
@@ -862,7 +668,7 @@ Focused Outputs:
       "projectContext",
       "projectBackground",
     ],
-  }
+  },
 };
 
 // Using the consolidated health check tool from simple-health-check.ts
@@ -1293,60 +1099,68 @@ async function main() {
   console.error("Loaded config:", JSON.stringify(config, null, 2));
 
   // Validate configuration
-  console.log("🔍 Validating configuration...");
+  console.error("Validating configuration...");
   const validationResult = validateConfiguration();
   printValidationResults(validationResult);
 
   if (!validationResult.valid) {
     console.error(
-      "❌ Configuration validation failed. Please fix the issues above."
+      "Configuration validation failed. Please fix the issues above."
     );
     console.error(
-      "💡 Tip: Check your .env file and ensure all required environment variables are set."
+      "Tip: Check your .env file and ensure all required environment variables are set."
     );
     process.exit(1);
   }
 
-  console.log("✅ Configuration validation passed. Starting server...");
+  console.error("Configuration validation passed. Starting server...");
 
   // Load and validate tool calling configuration
-  console.log("🔧 Loading tool calling configuration...");
+  console.error("Loading tool calling configuration...");
   const toolCallingConfig = loadToolCallingConfig();
   const toolValidation = validateToolCallingConfig(toolCallingConfig);
 
   if (!toolValidation.valid) {
-    console.error("❌ Tool calling configuration validation failed:");
+    console.error("Tool calling configuration validation failed:");
     toolValidation.errors.forEach((error) => console.error(`  - ${error}`));
     console.error(
-      "💡 Tip: Check your tool calling environment variables in .env file."
+      "Tip: Check your tool calling environment variables in .env file."
     );
     process.exit(1);
   }
 
   // Display tool configuration status
-  console.log("🔧 Tool Calling Configuration:");
-  console.log(
-    `  Read File: ${toolCallingConfig.readFile.enabled ? "✅" : "❌"}`
+  console.error("Tool Calling Configuration:");
+  console.error(
+    `  Read File: ${
+      toolCallingConfig.readFile.enabled ? "ENABLED" : "DISABLED"
+    }`
   );
-  console.log(`  Grep: ${toolCallingConfig.grep.enabled ? "✅" : "❌"}`);
-  console.log(
-    `  List Files: ${toolCallingConfig.listFiles.enabled ? "✅" : "❌"}`
+  console.error(
+    `  Grep: ${toolCallingConfig.grep.enabled ? "ENABLED" : "DISABLED"}`
   );
-  console.log(
+  console.error(
+    `  List Files: ${
+      toolCallingConfig.listFiles.enabled ? "ENABLED" : "DISABLED"
+    }`
+  );
+  console.error(
     `  Write File: ${
-      toolCallingConfig.writeToFile.enabled ? "❌ HIGH RISK" : "✅ DISABLED"
+      toolCallingConfig.writeToFile.enabled ? "ENABLED (HIGH RISK)" : "DISABLED"
     }`
   );
-  console.log(
+  console.error(
     `  Replace In File: ${
-      toolCallingConfig.replaceInFile.enabled ? "❌ HIGH RISK" : "✅ DISABLED"
+      toolCallingConfig.replaceInFile.enabled
+        ? "ENABLED (HIGH RISK)"
+        : "DISABLED"
     }`
   );
-  console.log(
+  console.error(
     `  Execute Command: ${
       toolCallingConfig.executeCommand.enabled
-        ? "❌ CRITICAL RISK"
-        : "✅ DISABLED"
+        ? "ENABLED (CRITICAL RISK)"
+        : "DISABLED"
     }`
   );
 
@@ -1645,7 +1459,7 @@ async function main() {
         }
       }
     } catch (error) {
-      console.error(`Error executing tool ${name}:`, error);
+      // Suppress detailed error logging to prevent stdout contamination
       return {
         content: [
           {

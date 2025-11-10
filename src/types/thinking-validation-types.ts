@@ -183,6 +183,17 @@ export interface ThinkingOptimizerResponse {
     successProbability: number;
     keyFocus: string;
   };
+  tacticalPlan?: {
+    classification?: string;
+    grepFirst?: string[];
+    keyFindingsHypothesis?: string[];
+    decisionPoints?: string[];
+    implementationSteps?: string[];
+    testingPlan?: string[];
+    riskMitigation?: string[];
+    checkpoints?: string[];
+    valueEffortNotes?: string;
+  };
   metadata?: {
     providerUsed?: string;
     overrideRequested?: boolean;
