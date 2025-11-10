@@ -69,7 +69,7 @@ export class PerformanceMonitor {
 
     // Log failed operations
     if (!metric.success) {
-      console.error(`❌ Operation failed:`, {
+      console.error(`Operation failed:`, {
         operation: metric.operationName,
         provider: metric.provider,
         error: metric.error,

@@ -4,19 +4,7 @@
 
 export const THINKING_VALIDATION_PROMPT = `You are an expert AI thinking validation assistant. You will receive thinking from a primary AI agent and must provide focused, actionable validation.
 
-IMPORTANT: You have access to file analysis tools (read_file, grep, list_files, execute_command) to examine the actual codebase. Use these tools proactively to validate assumptions and provide accurate analysis.
-
-🔍 GREP-FIRST WORKFLOW:
-1. Use grep to locate: functions, classes, imports, config keys, error handling
-2. Read_file only targeted sections around grep matches (never entire files)
-3. For large files: grep first → read targeted 10-20 lines around matches
-
-TOOL USAGE:
-- 🔍 grep first for patterns, then read_file targeted sections
-- 📂 list_files for structure, but grep before reading files
-- ⚡ execute_command to run scripts, check versions, validate functionality
-- 🎯 Mandatory: grep filesToAnalyze first, then targeted reads
-- 📖 Never read entire files > 50 lines without grep guidance
+IMPORTANT: When project files are provided, they have been pre-analyzed and included in the context for your review. Use this code context to validate assumptions and provide accurate analysis based on the actual codebase.
 
 DECISION TREE FOR VALIDATION APPROACH:
 1. IF incomplete context → Note missing information in response, proceed with available data
@@ -95,18 +83,7 @@ Response Format:
 
 export const IMPACT_ANALYSIS_PROMPT = `You are an expert impact analysis assistant. You receive proposed changes and must rapidly assess their blast radius and risk profile.
 
-IMPORTANT: You have access to file analysis tools (read_file, grep, list_files, execute_command) to examine the actual codebase. Use these tools proactively to understand dependencies and assess real impact.
-
-🔍 GREP-FIRST DEPENDENCY ANALYSIS:
-1. Use grep to find: component usage, imports, function calls, class instantiations
-2. Read_file targeted sections around grep matches for dependency details
-3. Trace all usage patterns across codebase with grep
-
-TOOL USAGE:
-- 🔍 grep for component usage and imports first
-- 📖 read_file targeted sections around grep matches
-- 📂 list_files for project structure
-- 🎯 grep affected files first, then targeted reads
+IMPORTANT: When project files are provided, they have been pre-analyzed and included in the context. Use this code context to understand dependencies and assess real impact based on the actual codebase.
 
 IMPACT ASSESSMENT DECISION TREE:
 1. Identify PRIMARY impact zone (what breaks immediately)
@@ -183,18 +160,7 @@ Response Format:
 
 export const ASSUMPTION_CHECKER_PROMPT = `You are an expert assumption validation assistant. You receive a set of assumptions and must rapidly distinguish between safe assumptions and dangerous ones.
 
-IMPORTANT: You have access to file analysis tools (read_file, grep, list_files, execute_command) to verify assumptions against the actual codebase. Use these tools to check the validity of each assumption.
-
-🔍 GREP-FIRST ASSUMPTION VERIFICATION:
-1. Use grep to find: config keys, function names, env vars, error messages, API endpoints
-2. Read_file targeted sections around grep matches for verification
-3. Check configurations and implementations with grep patterns
-
-TOOL USAGE:
-- 🔍 grep for evidence patterns first, then targeted reads
-- 📖 read_file sections around grep matches for context
-- 📂 list_files when file locations unclear
-- 🎯 grep referenced files first, then targeted reads
+IMPORTANT: When project files are provided, they have been pre-analyzed and included in the context. Use this code context to verify assumptions against the actual codebase and check the validity of each assumption.
 
 ASSUMPTION CLASSIFICATION LOGIC:
 1. SAFE: Widely documented, framework-guaranteed, or easily verifiable
@@ -264,18 +230,7 @@ Response Format:
 
 export const DEPENDENCY_MAPPER_PROMPT = `You are an expert dependency mapping assistant. You analyze system dependencies to identify failure points and optimization opportunities.
 
-IMPORTANT: You have access to file analysis tools (read_file, grep, list_files, execute_command) to examine the actual codebase and identify real dependencies. Use these tools to trace actual code relationships.
-
-🔍 GREP-FIRST DEPENDENCY TRACING:
-1. Use grep to find: imports, function calls, class instantiations, module references
-2. Read_file targeted sections around grep matches for relationship details
-3. Search entire codebase for all usage patterns with grep
-
-TOOL USAGE:
-- 🔍 grep for all component usages and references first
-- 📖 read_file targeted sections around grep matches
-- 📂 list_files for module structure
-- 🎯 grep files first, then targeted reads for import/export patterns
+IMPORTANT: When project files are provided, they have been pre-analyzed and included in the context. Use this code context to identify real dependencies and trace actual code relationships.
 
 DEPENDENCY ANALYSIS WORKFLOW:
 1. Map DIRECT dependencies (immediate requirements)
@@ -357,19 +312,8 @@ Response Format:
 export const THINKING_OPTIMIZER_PROMPT = `You are an expert thinking optimization assistant. Your role is to analyze the problem space and recommend the most effective thinking strategy.
 
 IMPORTANT:
-- You have access to file analysis tools (read_file, grep, list_files, execute_command) to understand the actual codebase and problem context. Use these tools to assess the current state and inform your strategy recommendations.
-- The "toolsToUse": output parameter is what you recommend the AI Coding Agent to use. NOT THE INTERNAL TOOLS AVAILABLE TO YOU!
-
-🔍 GREP-FIRST STRATEGY ANALYSIS:
-1. Use grep to find: algorithms, design patterns, error handling, performance code
-2. Read_file targeted sections around grep matches for implementation details
-3. Search codebase for existing solutions and patterns with grep
-
-TOOL USAGE:
-- 🔍 grep for existing patterns and complexity indicators first
-- 📖 read_file targeted sections around grep matches
-- 📂 list_files for project structure and scale
-- 🎯 grep implementation files first, then targeted reads
+- When project files are provided, they have been pre-analyzed and included in the context. Use this code context to understand the actual codebase and problem state.
+- The "toolsToUse" output parameter is what you recommend the AI Coding Agent to use for implementing the solution.
 
 PROBLEM CLASSIFICATION MATRIX:
 - WELL-DEFINED: Clear requirements, known solution patterns → Apply standard methodology
@@ -431,6 +375,41 @@ Response Format:
     },
     "successProbability": [0-100],
     "keyFocus": "what to focus on most"
+  },
+  "tacticalPlan": {
+    "classification": "problem classification (e.g., WELL-DEFINED bug_fix; moderate complexity; moderate time)",
+    "grepFirst": [
+      "Specific grep search terms to find relevant code (e.g., validateEmail, validatePassword)",
+      "Patterns to search for in the codebase"
+    ],
+    "keyFindingsHypothesis": [
+      "Expected findings based on problem analysis",
+      "Hypotheses about root causes"
+    ],
+    "decisionPoints": [
+      "Key decisions that need to be made",
+      "Trade-offs to consider"
+    ],
+    "implementationSteps": [
+      "Step 1: Specific actionable step",
+      "Step 2: Next step with concrete actions",
+      "Step 3: Continue with detailed steps"
+    ],
+    "testingPlan": [
+      "Unit tests to write",
+      "Integration tests needed",
+      "Edge cases to cover"
+    ],
+    "riskMitigation": [
+      "Potential risks and how to mitigate them",
+      "Fallback strategies"
+    ],
+    "checkpoints": [
+      "Checkpoint 1: Milestone to verify progress",
+      "Checkpoint 2: Next verification point",
+      "Checkpoint 3: Additional checkpoints as needed"
+    ],
+    "valueEffortNotes": "Assessment of the value/effort ratio and overall impact"
   },
   "metadata": {
     "fileAnalysisPerformed": [true/false - whether you examined actual files],
