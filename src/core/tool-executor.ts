@@ -13,7 +13,6 @@ import { globTool } from '../internal-tools/glob.js';
 import { grepTool } from '../internal-tools/grep.js';
 import { executeShellTool } from '../internal-tools/execute-shell.js';
 import { gitOperationTool } from '../internal-tools/git-operation.js';
-import { webSearchTool } from '../internal-tools/web-search.js';
 import { logger } from '../utils/logger.js';
 
 export interface ToolExecutionResult {
@@ -37,7 +36,6 @@ export class ToolExecutor {
     this.tools.set('grep', grepTool);
     this.tools.set('executeShell', executeShellTool);
     this.tools.set('gitOperation', gitOperationTool);
-    this.tools.set('webSearch', webSearchTool);
   }
 
   async executeTool(toolName: string, args: any): Promise<ToolExecutionResult> {
