@@ -2,6 +2,7 @@
 src/
 tests/
 docs/
+local_docs/
 chronos-data/
 
 # Development files
