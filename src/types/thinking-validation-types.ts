@@ -15,9 +15,8 @@ export interface AnalysisTarget {
 
 export interface ProjectContext {
   projectRoot: string;
-  filesToAnalyze?: string[];  // Made optional for backward compatibility
   workingDirectory?: string;
-  analysisTargets?: AnalysisTarget[];  // NEW: Client-driven targeting
+  analysisTargets?: AnalysisTarget[];
 }
 
 export interface ThinkingValidationRequest {

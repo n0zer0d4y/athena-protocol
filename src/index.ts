@@ -190,7 +190,7 @@ const THINKING_VALIDATION_TOOL: Tool = {
                 mode: {
                   type: "string",
                   enum: ["full", "head", "tail", "range"],
-                  description: "Read mode for this file",
+                  description: "'full'=when issue area unclear, 'head'=imports/setup, 'tail'=recent changes, 'range'=known lines",
                 },
                 lines: {
                   type: "number",
@@ -316,7 +316,7 @@ const IMPACT_ANALYSIS_TOOL: Tool = {
                 mode: {
                   type: "string",
                   enum: ["full", "head", "tail", "range"],
-                  description: "Read mode for this file",
+                  description: "'full'=when issue area unclear, 'head'=imports/setup, 'tail'=recent changes, 'range'=known lines",
                 },
                 lines: {
                   type: "number",
@@ -420,7 +420,7 @@ const ASSUMPTION_CHECKER_TOOL: Tool = {
                 mode: {
                   type: "string",
                   enum: ["full", "head", "tail", "range"],
-                  description: "Read mode for this file",
+                  description: "'full'=when issue area unclear, 'head'=imports/setup, 'tail'=recent changes, 'range'=known lines",
                 },
                 lines: {
                   type: "number",
@@ -525,7 +525,7 @@ const DEPENDENCY_MAPPER_TOOL: Tool = {
                 mode: {
                   type: "string",
                   enum: ["full", "head", "tail", "range"],
-                  description: "Read mode for this file",
+                  description: "'full'=when issue area unclear, 'head'=imports/setup, 'tail'=recent changes, 'range'=known lines",
                 },
                 lines: {
                   type: "number",
@@ -628,7 +628,7 @@ const THINKING_OPTIMIZER_TOOL: Tool = {
                 mode: {
                   type: "string",
                   enum: ["full", "head", "tail", "range"],
-                  description: "Read mode for this file",
+                  description: "'full'=when issue area unclear, 'head'=imports/setup, 'tail'=recent changes, 'range'=known lines",
                 },
                 lines: {
                   type: "number",
@@ -729,23 +729,6 @@ function validateThinkingValidationParams(args: any): {
       "Missing or invalid required parameter: 'projectContext.projectRoot' must be a string"
     );
   }
-  // Validate filesToAnalyze if provided (now optional)
-  if (args.projectContext.filesToAnalyze !== undefined) {
-    if (!Array.isArray(args.projectContext.filesToAnalyze)) {
-      throw new ToolParameterError(
-        "Invalid parameter: 'projectContext.filesToAnalyze' must be an array if provided"
-      );
-    }
-    // Validate that all files in the array are valid strings
-    for (const file of args.projectContext.filesToAnalyze) {
-      if (typeof file !== "string" || file.trim().length === 0) {
-        throw new ToolParameterError(
-          "Invalid filesToAnalyze entry: all entries must be non-empty strings representing file paths"
-        );
-      }
-    }
-  }
-
   if (!args.projectBackground || typeof args.projectBackground !== "string") {
     throw new ToolParameterError(
       "Missing or invalid required parameter: 'projectBackground' must be a non-empty string"
@@ -795,23 +778,6 @@ function validateImpactAnalysisParams(args: any): {
       "Missing or invalid required parameter: 'projectContext.projectRoot' must be a string"
     );
   }
-  // Validate filesToAnalyze if provided (now optional)
-  if (args.projectContext.filesToAnalyze !== undefined) {
-    if (!Array.isArray(args.projectContext.filesToAnalyze)) {
-      throw new ToolParameterError(
-        "Invalid parameter: 'projectContext.filesToAnalyze' must be an array if provided"
-      );
-    }
-    // Validate that all files in the array are valid strings
-    for (const file of args.projectContext.filesToAnalyze) {
-      if (typeof file !== "string" || file.trim().length === 0) {
-        throw new ToolParameterError(
-          "Invalid filesToAnalyze entry: all entries must be non-empty strings representing file paths"
-        );
-      }
-    }
-  }
-
   if (!args.projectBackground || typeof args.projectBackground !== "string") {
     throw new ToolParameterError(
       "Missing or invalid required parameter: 'projectBackground' must be a non-empty string"
@@ -878,23 +844,6 @@ function validateAssumptionCheckerParams(args: any): {
       "Missing or invalid required parameter: 'projectContext.projectRoot' must be a string"
     );
   }
-  // Validate filesToAnalyze if provided (now optional)
-  if (args.projectContext.filesToAnalyze !== undefined) {
-    if (!Array.isArray(args.projectContext.filesToAnalyze)) {
-      throw new ToolParameterError(
-        "Invalid parameter: 'projectContext.filesToAnalyze' must be an array if provided"
-      );
-    }
-    // Validate that all files in the array are valid strings
-    for (const file of args.projectContext.filesToAnalyze) {
-      if (typeof file !== "string" || file.trim().length === 0) {
-        throw new ToolParameterError(
-          "Invalid filesToAnalyze entry: all entries must be non-empty strings representing file paths"
-        );
-      }
-    }
-  }
-
   if (!args.projectBackground || typeof args.projectBackground !== "string") {
     throw new ToolParameterError(
       "Missing or invalid required parameter: 'projectBackground' must be a non-empty string"
@@ -941,23 +890,6 @@ function validateDependencyMapperParams(args: any): {
       "Missing or invalid required parameter: 'projectContext.projectRoot' must be a string"
     );
   }
-  // Validate filesToAnalyze if provided (now optional)
-  if (args.projectContext.filesToAnalyze !== undefined) {
-    if (!Array.isArray(args.projectContext.filesToAnalyze)) {
-      throw new ToolParameterError(
-        "Invalid parameter: 'projectContext.filesToAnalyze' must be an array if provided"
-      );
-    }
-    // Validate that all files in the array are valid strings
-    for (const file of args.projectContext.filesToAnalyze) {
-      if (typeof file !== "string" || file.trim().length === 0) {
-        throw new ToolParameterError(
-          "Invalid filesToAnalyze entry: all entries must be non-empty strings representing file paths"
-        );
-      }
-    }
-  }
-
   if (!args.projectBackground || typeof args.projectBackground !== "string") {
     throw new ToolParameterError(
       "Missing or invalid required parameter: 'projectBackground' must be a non-empty string"
@@ -1025,23 +957,6 @@ function validateThinkingOptimizerParams(args: any): {
       "Missing or invalid required parameter: 'projectContext.projectRoot' must be a string"
     );
   }
-  // Validate filesToAnalyze if provided (now optional)
-  if (args.projectContext.filesToAnalyze !== undefined) {
-    if (!Array.isArray(args.projectContext.filesToAnalyze)) {
-      throw new ToolParameterError(
-        "Invalid parameter: 'projectContext.filesToAnalyze' must be an array if provided"
-      );
-    }
-    // Validate that all files in the array are valid strings
-    for (const file of args.projectContext.filesToAnalyze) {
-      if (typeof file !== "string" || file.trim().length === 0) {
-        throw new ToolParameterError(
-          "Invalid filesToAnalyze entry: all entries must be non-empty strings representing file paths"
-        );
-      }
-    }
-  }
-
   if (!args.projectBackground || typeof args.projectBackground !== "string") {
     throw new ToolParameterError(
       "Missing or invalid required parameter: 'projectBackground' must be a non-empty string"

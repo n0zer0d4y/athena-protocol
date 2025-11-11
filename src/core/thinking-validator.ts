@@ -562,205 +562,24 @@ export class ThinkingValidator {
       throw new Error("Tool calling service not available");
     }
 
-    const { projectRoot, filesToAnalyze, workingDirectory, analysisTargets } = projectContext;
-    
-    // NEW: Check if client provides targeted analysis
-    if (analysisTargets && analysisTargets.length > 0) {
-      return await this.analyzeTargetedSections(
-        analysisTargets,
-        projectRoot,
-        workingDirectory
+    const { projectRoot, workingDirectory, analysisTargets } = projectContext;
+
+    // CRITICAL: analysisTargets is REQUIRED for file analysis
+    if (!analysisTargets || analysisTargets.length === 0) {
+      throw new Error(
+        "projectContext.analysisTargets is required for file analysis. " +
+          "Provide files to analyze with modes: 'full' (complete file), 'head' (imports/setup), " +
+          "'tail' (recent changes), or 'range' (specific lines). " +
+          "Example: [{ file: 'src/main.ts', mode: 'full', priority: 'critical' }]"
       );
     }
 
-    // FALLBACK: Use enhanced generic analysis with filesToAnalyze
-    const analysis: string[] = [];
-    let filesAnalyzed = 0;
-    const toolsUsed: string[] = [];
-
-    // Analyze key files using CONCURRENT reading with modes
-    if (filesToAnalyze && filesToAnalyze.length > 0) {
-      analysis.push("## Key Files Analysis");
-      analysis.push(
-        "*(Analysis performed using concurrent file reading for efficiency)*"
-      );
-
-      // ENHANCED: Prepare concurrent read requests with head mode (first 100 lines)
-      const fileRequests = filesToAnalyze.map((filePath) => ({
-        path: isAbsolute(filePath)
-          ? filePath
-          : workingDirectory
-            ? resolve(workingDirectory, filePath)
-            : resolve(projectRoot, filePath),
-        mode: "head" as const,
-        lines: 100, // Read first 100 lines for overview
-      }));
-
-      // CONCURRENT reading (much faster than sequential)
-      const readResults = await this.toolCallingService.readMultipleFiles(fileRequests);
-      toolsUsed.push("readMultipleFiles");
-
-      if (readResults.success) {
-        filesAnalyzed = readResults.results.filter((r) => r.content).length;
-
-        for (let i = 0; i < filesToAnalyze.length; i++) {
-          const filePath = filesToAnalyze[i];
-          const result = readResults.results[i];
-
-          analysis.push(`### ${filePath}`);
-
-          if (result.content) {
-            const lines = result.content.split("\n");
-            analysis.push("**File Content (first 100 lines):**");
-            analysis.push("```");
-            analysis.push(result.content);
-            analysis.push("```");
-
-            if (lines.length >= 100) {
-              analysis.push(`*(File has more content, showing first 100 lines)*`);
-            }
-          } else {
-            analysis.push(`Failed to read file: ${result.error}`);
-          }
-        }
-      } else {
-        analysis.push(`Failed to read files: ${readResults.error}`);
-      }
-
-      // LEGACY: Still use grep for pattern discovery (keeping for backward compat)
-      for (const filePath of filesToAnalyze) {
-        try {
-          // Properly handle both absolute and relative paths
-          let fullPath: string;
-          if (isAbsolute(filePath)) {
-            // File path is already absolute, use it directly
-            fullPath = filePath;
-          } else {
-            // File path is relative, resolve relative to workingDirectory or projectRoot
-            fullPath = workingDirectory
-              ? resolve(workingDirectory, filePath)
-              : resolve(projectRoot, filePath);
-          }
-
-          analysis.push(`### ${filePath}`);
-
-          // GREP-FIRST: Search for key patterns to understand file structure
-          const grepPatterns = [
-            "function|const|class|export|import",
-            "component|Component|render|return",
-            "error|catch|try|throw",
-            "async|await|promise|Promise",
-          ];
-
-          let fileContent = "";
-          let grepResults: string[] = [];
-
-          for (const pattern of grepPatterns) {
-            try {
-              const grepResult = await this.toolCallingService.grep(
-                pattern,
-                fullPath
-              );
-              if (grepResult.success && grepResult.matches) {
-                grepResults.push(
-                  `${pattern}: ${grepResult.matches.length} matches`
-                );
-                // Add a few key matches to analysis
-                const keyMatches = grepResult.matches
-                  .slice(0, 3)
-                  .map((m) => `Line ${m.line}: ${m.content}`);
-                if (keyMatches.length > 0) {
-                  grepResults.push(...keyMatches);
-                }
-              }
-            } catch (error) {
-              // Continue with other patterns
-            }
-          }
-
-          if (grepResults.length > 0) {
-            analysis.push("**Key Patterns Found:**");
-            analysis.push("```");
-            analysis.push(grepResults.join("\n"));
-            analysis.push("```");
-            toolsUsed.push("grep");
-          }
-
-          // TARGETED READ: Read specific sections based on grep findings
-          const result = await this.toolCallingService.readFile(fullPath);
-          toolsUsed.push("readFile");
-          if (result.success && result.content) {
-            filesAnalyzed++;
-            const lines = result.content.split("\n");
-
-            // Read first 50 lines (imports/exports/setup)
-            analysis.push("**File Content (first 50 lines):**");
-            analysis.push("```");
-            analysis.push(lines.slice(0, 50).join("\n"));
-            analysis.push("```");
-
-            // If file is larger, show targeted sections around key patterns
-            if (lines.length > 100) {
-              // Try to find main function/component definitions
-              const mainFunctionStart = lines.findIndex((line) =>
-                /^\s*(function|const|class|export)/.test(line)
-              );
-
-              if (mainFunctionStart >= 0) {
-                const endLine = Math.min(mainFunctionStart + 30, lines.length);
-                analysis.push(
-                  `**Main Implementation (lines ${
-                    mainFunctionStart + 1
-                  }-${endLine}):**`
-                );
-                analysis.push("```");
-                analysis.push(
-                  lines.slice(mainFunctionStart, endLine).join("\n")
-                );
-                analysis.push("```");
-              }
-
-              analysis.push(
-                `*(File has ${lines.length} total lines, showing targeted sections)*`
-              );
-            }
-          } else {
-            analysis.push(`Failed to read file: ${result.error}`);
-          }
-        } catch (error) {
-          analysis.push(`Error analyzing file: ${(error as Error).message}`);
-        }
-      }
-    }
-
-    // Get project structure overview
-    try {
-      analysis.push("\n## Project Structure");
-      const listResult = await this.toolCallingService.listFiles(
-        projectRoot,
-        false
-      );
-      toolsUsed.push("listFiles");
-      if (listResult.success && listResult.files) {
-        const fileNames = listResult.files.map((file) =>
-          file.replace(projectRoot + "/", "").replace(projectRoot + "\\", "")
-        );
-        analysis.push(`Root directory contains ${fileNames.length} files:`);
-        analysis.push(fileNames.slice(0, 20).join(", "));
-        if (fileNames.length > 20) {
-          analysis.push(`... and ${fileNames.length - 20} more files`);
-        }
-      }
-    } catch (error) {
-      analysis.push("Failed to analyze project structure");
-    }
-
-    return {
-      content: analysis.join("\n"),
-      fileAnalysisPerformed: filesAnalyzed > 0,
-      filesAnalyzed,
-      toolsUsed: [...new Set(toolsUsed)], // Remove duplicates
-    };
+    // Use targeted analysis
+    return await this.analyzeTargetedSections(
+      analysisTargets,
+      projectRoot,
+      workingDirectory
+    );
   }
 
   private buildThinkingValidationPrompt(
@@ -1122,16 +941,27 @@ ${
         const fullPath = isAbsolute(target.file)
           ? target.file
           : workingDirectory
-            ? resolve(workingDirectory, target.file)
-            : resolve(projectRoot, target.file);
+          ? resolve(workingDirectory, target.file)
+          : resolve(projectRoot, target.file);
 
-        return {
+        const mode = target.mode || "head";
+
+        // Build request based on mode requirements
+        const request: any = {
           path: fullPath,
-          mode: target.mode || "range",
-          lines: target.lines,
-          startLine: target.startLine,
-          endLine: target.endLine,
+          mode: mode,
         };
+
+        // Add mode-specific parameters
+        if (mode === "head" || mode === "tail") {
+          request.lines = target.lines || 50;
+        } else if (mode === "range") {
+          request.startLine = target.startLine;
+          request.endLine = target.endLine;
+        }
+        // For "full" mode, no additional params needed
+
+        return request;
       });
 
       // Read all files in this priority group concurrently
@@ -1154,8 +984,9 @@ ${
 
           if (target.mode || target.startLine) {
             const modeInfo = target.mode
-              ? `Mode: ${target.mode}${target.lines ? ` (${target.lines} lines)` : ""
-              }`
+              ? `Mode: ${target.mode}${
+                  target.lines ? ` (${target.lines} lines)` : ""
+                }`
               : `Lines ${target.startLine}-${target.endLine}`;
             analysis.push(`**${modeInfo}**`);
           }
