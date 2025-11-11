@@ -27,13 +27,13 @@ This server handles API keys for multiple LLM providers. Ensure your `.env` file
 
 ## Background
 
-The Athena Protocol MCP Server provides systematic thinking validation for AI coding agents. It supports 15 LLM providers and offers various validation tools including thinking validation, impact analysis, assumption checking, dependency mapping, and thinking optimization.
+The Athena Protocol MCP Server provides systematic thinking validation for AI coding agents. It supports 14 LLM providers and offers various validation tools including thinking validation, impact analysis, assumption checking, dependency mapping, and thinking optimization.
 
 Key features:
 
 - **Smart Client Mode** with precision-targeted code analysis (70-85% token reduction)
 - Environment-driven configuration with no hardcoded defaults
-- Multi-provider LLM support (15 providers) with automatic fallback
+- Multi-provider LLM support (14 providers) with automatic fallback
 - Enhanced file reading with multiple modes (full, head, tail, range)
 - Concurrent file operations for 3-4× performance improvement
 - Session-based validation history and memory management
@@ -84,7 +84,7 @@ npm test
 
 #### Supported Providers
 
-The Athena Protocol supports 15 LLM providers. While OpenAI is commonly used, you can configure any of:
+The Athena Protocol supports 14 LLM providers. While OpenAI is commonly used, you can configure any of:
 
 **Major Cloud Providers:**
 
@@ -157,7 +157,7 @@ node dist/index.js
 
 #### Multi-Provider LLM Support
 
-Athena Protocol supports 15 providers including:
+Athena Protocol supports 14 providers including:
 
 - **Cloud Providers**: OpenAI, Anthropic, Google, Azure OpenAI, AWS Bedrock, Vertex AI
 - **Specialized**: OpenRouter (200+ models), Groq, Mistral, Perplexity, XAI, Qwen
