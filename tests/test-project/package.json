@@ -1,6 +1,6 @@
 {
   "name": "test-api-server",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Test Node.js API server",
   "main": "src/server.js",
   "scripts": {

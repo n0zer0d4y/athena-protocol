@@ -88,7 +88,7 @@ async function testLiveMCPTools() {
           capabilities: {},
           clientInfo: {
             name: "live-tools-test",
-            version: "1.0.0",
+            version: "0.1.0",
           },
         },
       });

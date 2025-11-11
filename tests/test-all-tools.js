@@ -16,7 +16,7 @@ async function setupTestEnvironment() {
   await fs.writeFile(join(testDir, 'test.js'), 'console.log("Hello, World!");');
   await fs.writeFile(join(testDir, 'package.json'), JSON.stringify({
     name: 'test-package',
-    version: '1.0.0',
+    version: '0.1.0',
     scripts: { test: 'echo "test"' }
   }, null, 2));
   await fs.writeFile(join(testDir, 'README.md'), '# Test Package\n\nThis is a test package.');

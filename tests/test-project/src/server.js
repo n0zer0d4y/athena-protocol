@@ -336,7 +336,7 @@ app.use(limiter);
 app.get("/api", (req, res) => {
   res.json({
     message: "API is running",
-    version: "1.0.0",
+    version: "0.1.0",
     endpoints: ["/api/users", "/api/health", "/api/status"],
   });
 });
