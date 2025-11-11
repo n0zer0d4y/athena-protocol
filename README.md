@@ -131,6 +131,29 @@ See the [detailed provider guide](./docs/PROVIDER_GUIDE.md) for complete setup i
 
 ## Usage
 
+### MCP Client Configuration
+
+Add this configuration to your MCP client settings file (e.g., `~/.cursor/mcp.json` or Claude Desktop's config):
+
+```json
+{
+  "mcpServers": {
+    "athena-protocol": {
+      "command": "node",
+      "args": ["/absolute/path/to/athena-protocol/dist/index.js"],
+      "type": "stdio",
+      "timeout": 300
+    }
+  }
+}
+```
+
+**Configuration Notes:**
+
+- Replace `/absolute/path/to/athena-protocol/` with your actual installation path
+- `timeout`: Set to 300 (5 minutes) for reasoning models; reduce to 60-120 for faster models
+- Ensure the server is built (`npm run build`) before starting your MCP client
+
 ### Server Modes
 
 #### MCP Server Mode (for production use)
