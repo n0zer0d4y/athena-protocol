@@ -1,0 +1,35 @@
+services:
+  athena-protocol:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: athena-protocol:0.1.0
+    container_name: athena-protocol
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+    env_file:
+      - .env
+    volumes:
+      # Mount .env file (override env_file if needed)
+      - ./.env:/app/.env:ro
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "require('http').get('http://localhost:3000/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+    networks:
+      - athena-network
+
+networks:
+  athena-network:
+    driver: bridge
