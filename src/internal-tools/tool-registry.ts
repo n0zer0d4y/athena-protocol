@@ -17,7 +17,6 @@ import { globTool } from "./glob.js";
 import { grepTool } from "./grep.js";
 import { executeShellTool } from "./execute-shell.js";
 import { gitOperationTool } from "./git-operation.js";
-import { webSearchTool } from "./web-search.js";
 
 export interface ToolRegistry {
   // Enhanced tools
@@ -36,7 +35,6 @@ export interface ToolRegistry {
   grep: (args: any) => Promise<any>;
   executeShell: (args: any) => Promise<any>;
   gitOperation: (args: any) => Promise<any>;
-  webSearch: (args: any) => Promise<any>;
 }
 
 export function createToolRegistry(): ToolRegistry {
@@ -57,6 +55,5 @@ export function createToolRegistry(): ToolRegistry {
     grep: grepTool,
     executeShell: executeShellTool,
     gitOperation: gitOperationTool,
-    webSearch: webSearchTool,
   };
 }
