@@ -7,7 +7,7 @@
 [![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg?style=flat-square)](https://github.com/RichardLitt/standard-readme)
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 
- An intelligent MCP server that acts as an AI tech lead for coding agents—providing expert validation, impact analysis, and strategic guidance before code changes are made. Like a senior engineer reviewing your approach, Athena Protocol helps AI agents catch critical issues early, validate assumptions against the actual codebase, and optimize their problem-solving strategies. The result: higher quality code, fewer regressions, and more thoughtful architectural decisions.
+An intelligent MCP server that acts as an AI tech lead for coding agents—providing expert validation, impact analysis, and strategic guidance before code changes are made. Like a senior engineer reviewing your approach, Athena Protocol helps AI agents catch critical issues early, validate assumptions against the actual codebase, and optimize their problem-solving strategies. The result: higher quality code, fewer regressions, and more thoughtful architectural decisions.
 
 **Key Feature:** Precision file analysis with `analysisTargets` - achieve 70-85% token reduction and 3-4× faster performance with precision-targeted code analysis. See [Enhanced File Analysis](#enhanced-file-analysis-new) for details.
 
