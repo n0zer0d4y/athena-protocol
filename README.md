@@ -58,22 +58,27 @@ npm run build
 
 The Athena Protocol uses 100% environment-driven configuration - no hardcoded provider values or defaults. Configure everything through your `.env` file:
 
-```bash
-# 1. Get your API key from any supported provider
-# 2. Create .env file with REQUIRED configuration:
-echo "DEFAULT_LLM_PROVIDER=openai" > .env
-echo "PROVIDER_SELECTION_PRIORITY=openai,anthropic,google" >> .env
-echo "OPENAI_API_KEY=sk-your-openai-api-key-here" >> .env
-echo "OPENAI_MODEL=gpt-4-turbo" >> .env
-echo "OPENAI_TEMPERATURE=0.7" >> .env
-echo "OPENAI_MAX_TOKENS=4000" >> .env
+1. **Copy the example configuration:**
 
-# 3. Install and test
-npm install
-npm run build
-npm run validate-config  # This will validate your configuration
-npm test
+```bash
+   cp .env.example .env
 ```
+
+2. **Edit `.env` and configure your provider:**
+
+   - Set `DEFAULT_LLM_PROVIDER` (e.g., `openai`, `anthropic`, `google`)
+   - Add your API key for the chosen provider
+   - Configure model and parameters (optional)
+
+3. **Validate and test:**
+   ```bash
+   npm install
+   npm run build
+   npm run validate-config  # Validates your .env configuration
+   npm test
+   ```
+
+See `.env.example` for complete configuration options and all 14 supported providers.
 
 #### Critical Configuration Requirements
 
@@ -88,16 +93,16 @@ The Athena Protocol supports 14 LLM providers. While OpenAI is commonly used, yo
 
 **Major Cloud Providers:**
 
-- OpenAI - GPT-4, GPT-4-turbo, GPT-3.5-turbo
-- Anthropic - Claude 3 Sonnet/Opus/Haiku
-- Google - Gemini Pro/Pro Vision
+- OpenAI - GPT-5 (with thinking), GPT-4o, GPT-4-turbo
+- Anthropic - Claude Opus 4.1, Claude Sonnet 4.5, Claude Haiku 4.5
+- Google - Gemini 2.5 (Flash/Pro/Ultra)
 - Azure OpenAI - Enterprise-grade GPT models
 - AWS Bedrock - Claude, Llama, and more
 - Google Vertex AI - Gemini with enterprise features
 
 **Specialized Providers:**
 
-- OpenRouter - Access to 200+ models
+- OpenRouter - Access to 400+ models
 - Groq - Ultra-fast inference
 - Mistral AI - Open-source models
 - Perplexity - Search-augmented models
@@ -122,7 +127,7 @@ npm run build && npm start
 
 #### Provider Switching
 
-See the [detailed provider guide](./PROVIDER_GUIDE.md) for complete setup instructions.
+See the [detailed provider guide](./docs/PROVIDER_GUIDE.md) for complete setup instructions.
 
 ## Usage
 
@@ -160,7 +165,7 @@ node dist/index.js
 Athena Protocol supports 14 providers including:
 
 - **Cloud Providers**: OpenAI, Anthropic, Google, Azure OpenAI, AWS Bedrock, Vertex AI
-- **Specialized**: OpenRouter (200+ models), Groq, Mistral, Perplexity, XAI, Qwen
+- **Specialized**: OpenRouter (400+ models), Groq, Mistral, Perplexity, XAI, Qwen
 - **Local/Self-Hosted**: Ollama, ZAI
 
 All providers require API keys (except Ollama for local models). See configuration section for setup.
@@ -323,7 +328,11 @@ Optimize thinking approach based on problem type.
 
 **Output:**
 
-Returns optimized strategy, recommended tools, time allocation, success probability, and key focus areas.
+Returns a comprehensive optimization strategy including:
+
+- **optimizedStrategy**: Recommended approach, tools to use, time allocation breakdown, success probability, and key focus areas
+- **tacticalPlan**: Detailed implementation guidance with problem classification, grep search strategies, key findings hypotheses, decision points, step-by-step implementation plan, testing strategy, risk mitigation, progress checkpoints, and value/effort assessment
+- **metadata**: Provider used and file analysis metrics
 
 ### athena_health_check
 
@@ -393,7 +402,7 @@ All tools now support **Smart Client Mode** with `analysisTargets` for precision
 
 **Note:** All tools require `analysisTargets` for file analysis. Provide at least one file with appropriate read mode (`full`, `head`, `tail`, or `range`).
 
-## ⚠️ Important Notices
+## Important Notices
 
 ### Memory System Status
 
