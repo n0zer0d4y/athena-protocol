@@ -353,7 +353,7 @@ docker-compose.override.yml
 .docusaurus
 
 # --- Documentation ---
-docs/
+local_docs/
 chronos-data/
 docs/_build/
 site/
