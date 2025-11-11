@@ -1,10 +1,30 @@
 {
-  "name": "athena-protocol",
-  "version": "1.0.0",
-  "description": "A comprehensive MCP server for intelligent thinking validation and systematic reasoning",
-  "main": "dist/index.js",
+  "name": "@n0zer0d4y/athena-protocol",
+  "version": "0.1.0",
+  "description": "An intelligent MCP server that acts as an AI tech lead for coding agents—providing expert validation, impact analysis, and strategic guidance before code changes are made",
+  "license": "MIT",
+  "author": "Lloyd Barcatan",
+  "homepage": "https://github.com/n0zer0d4y/athena-protocol",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/n0zer0d4y/athena-protocol.git"
+  },
+  "bugs": {
+    "url": "https://github.com/n0zer0d4y/athena-protocol/issues"
+  },
   "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "athena-protocol": "dist/index.js"
+  },
+  "files": [
+    "dist/**/*.js",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
+    "prepare": "npm run build",
+    "prepublishOnly": "npm test",
     "build": "tsc",
     "start": "node dist/index.js",
     "start:standalone": "node dist/standalone-server.js",
@@ -64,12 +84,19 @@
   },
   "keywords": [
     "mcp",
+    "mcp-server",
+    "model-context-protocol",
     "athena-protocol",
     "ai",
     "llm",
+    "ai-agent",
     "coding-assistant",
-    "development"
-  ],
-  "author": "Lloyd Barcatan",
-  "license": "MIT"
+    "thinking-validation",
+    "code-review",
+    "impact-analysis",
+    "claude",
+    "openai",
+    "anthropic",
+    "development-tools"
+  ]
 }
