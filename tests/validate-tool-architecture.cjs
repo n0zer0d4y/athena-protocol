@@ -130,12 +130,17 @@ async function validateToolArchitecture() {
             urgency: "medium",
             projectContext: {
               projectRoot: path.resolve(__dirname, "tests/test-project"),
-              filesToAnalyze: [
-                path.resolve(__dirname, "tests/test-project/src/server.js"),
-                path.resolve(
-                  __dirname,
-                  "tests/test-project/src/routes/user.js"
-                ),
+              analysisTargets: [
+                {
+                  file: path.resolve(__dirname, "tests/test-project/src/server.js"),
+                  mode: "full",
+                  priority: "critical",
+                },
+                {
+                  file: path.resolve(__dirname, "tests/test-project/src/routes/user.js"),
+                  mode: "full",
+                  priority: "important",
+                },
               ],
               workingDirectory: path.resolve(__dirname, "tests/test-project"),
             },

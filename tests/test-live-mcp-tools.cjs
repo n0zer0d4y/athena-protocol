@@ -141,9 +141,18 @@ async function testLiveMCPTools() {
             urgency: "high",
             projectContext: {
               projectRoot: path.resolve(__dirname),
-              filesToAnalyze: [
-                path.resolve(__dirname, "package.json"),
-                path.resolve(__dirname, "ENV_REFERENCE.md"),
+              analysisTargets: [
+                {
+                  file: path.resolve(__dirname, "package.json"),
+                  mode: "full",
+                  priority: "important",
+                },
+                {
+                  file: path.resolve(__dirname, "ENV_REFERENCE.md"),
+                  mode: "head",
+                  lines: 100,
+                  priority: "supplementary",
+                },
               ],
               workingDirectory: path.resolve(__dirname),
             },

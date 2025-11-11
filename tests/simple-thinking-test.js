@@ -68,7 +68,10 @@ async function testThinkingValidatorDirectly() {
       urgency: "high",
       projectContext: {
         projectRoot: path.resolve(__dirname, "../test-project"),
-        filesToAnalyze: ["package.json", "src/server.js"],
+        analysisTargets: [
+          { file: "package.json", mode: "full", priority: "important" },
+          { file: "src/server.js", mode: "full", priority: "critical" },
+        ],
         workingDirectory: path.resolve(__dirname, "../test-project"),
       },
       projectBackground:

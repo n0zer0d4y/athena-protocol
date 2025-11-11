@@ -149,7 +149,10 @@ async function testThinkingValidation() {
           urgency: "high",
           projectContext: {
             projectRoot: path.join(__dirname, "../test-project"),
-            filesToAnalyze: ["package.json", "src/server.js"],
+            analysisTargets: [
+              { file: "package.json", mode: "full", priority: "important" },
+              { file: "src/server.js", mode: "full", priority: "critical" },
+            ],
             workingDirectory: path.join(__dirname, "../test-project"),
           },
           projectBackground:
