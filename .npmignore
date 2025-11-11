@@ -1,0 +1,57 @@
+# Source files (dist/ is published via "files" in package.json)
+src/
+tests/
+docs/
+chronos-data/
+
+# Development files
+coverage/
+.cache/
+.temp/
+*.tmp
+*.tgz
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Config files
+tsconfig.json
+eslint.config.mjs
+.eslintrc*
+.prettierrc*
+*.config.js
+*.config.ts
+jest.config.*
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Environment files
+.env*
+!.env.example
+
+# Git files
+.git/
+.gitignore
+.gitattributes
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+.travis.yml
+
+# Build artifacts
+*.log
+.turbo/
+
+# Backup files
+*.backup
+*.bak
+*~
+
