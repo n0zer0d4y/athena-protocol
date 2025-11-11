@@ -1,11 +1,15 @@
 # Athena Protocol MCP Server
 
-[![license](https://img.shields.io/github/license/:user/:repo.svg)](LICENSE)
+![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?logo=typescript&logoColor=white)
+![MCP Dev](https://badge.mcpx.dev?type=dev "MCP Dev")
+![MCP Server](https://badge.mcpx.dev?type=server "MCP Server")
+![MCP server with features'](https://badge.mcpx.dev?type=server&features=tools "MCP server with features")
 [![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg?style=flat-square)](https://github.com/RichardLitt/standard-readme)
+![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 
-A comprehensive, intelligent MCP server designed to provide systematic thinking validation for LLM coding agents. This server enables AI agents to achieve higher accuracy through focused validation of reasoning processes before action, with streamlined communication to prevent endless loops and information overload.
+ An intelligent MCP server that acts as an AI tech lead for coding agents—providing expert validation, impact analysis, and strategic guidance before code changes are made. Like a senior engineer reviewing your approach, Athena Protocol helps AI agents catch critical issues early, validate assumptions against the actual codebase, and optimize their problem-solving strategies. The result: higher quality code, fewer regressions, and more thoughtful architectural decisions.
 
-**Latest Enhancement:** Smart Client Mode with `analysisTargets` - achieve 70-85% token reduction and 3-4× faster performance with precision-targeted code analysis. See [Enhanced File Analysis](#enhanced-file-analysis-new) for details.
+**Key Feature:** Precision file analysis with `analysisTargets` - achieve 70-85% token reduction and 3-4× faster performance with precision-targeted code analysis. See [Enhanced File Analysis](#enhanced-file-analysis-new) for details.
 
 ## Table of Contents
 
@@ -202,9 +206,8 @@ Validate the primary agent's thinking process with focused, essential informatio
 - `urgency` (string): Urgency level (`low`, `medium`, or `high`)
 - `projectContext` (object): Project context for file analysis
   - `projectRoot` (string, required): Absolute path to project root
-  - `filesToAnalyze` (array, optional): Array of absolute file paths (legacy mode)
   - `workingDirectory` (string, optional): Current working directory
-  - `analysisTargets` (array, optional): **NEW** - Specific code sections with targeted reading
+  - `analysisTargets` (array, **REQUIRED**): Specific code sections with targeted reading
     - `file` (string, required): File path (relative or absolute)
     - `mode` (string, optional): Read mode - `full`, `head`, `tail`, or `range`
     - `lines` (number, optional): Number of lines (for head/tail modes)
@@ -234,7 +237,7 @@ Quickly identify key impacts of proposed changes.
   - `files` (array, optional): Affected files
 - `projectContext` (object): Project context (same structure as thinking_validation)
   - `projectRoot` (string, required)
-  - `filesToAnalyze` or `analysisTargets` (optional)
+  - `analysisTargets` (array, **REQUIRED**): Files to analyze with read modes
   - `workingDirectory` (optional)
 - `projectBackground` (string): Brief project description
 
@@ -262,7 +265,7 @@ Rapidly validate key assumptions without over-analysis.
   - `environment` (string, required): Environment (production, development, staging, testing)
 - `projectContext` (object): Project context (same structure as thinking_validation)
   - `projectRoot` (string, required)
-  - `filesToAnalyze` or `analysisTargets` (optional)
+  - `analysisTargets` (array, **REQUIRED**): Files to analyze with read modes
 - `projectBackground` (string): Brief project description
 
 **Optional Parameters:**
@@ -286,7 +289,7 @@ Identify critical dependencies efficiently.
   - `components` (array, optional): Components being changed
 - `projectContext` (object): Project context (same structure as thinking_validation)
   - `projectRoot` (string, required)
-  - `filesToAnalyze` or `analysisTargets` (optional)
+  - `analysisTargets` (array, **REQUIRED**): Files to analyze with read modes
 - `projectBackground` (string): Brief project description
 
 **Optional Parameters:**
@@ -310,7 +313,7 @@ Optimize thinking approach based on problem type.
 - `currentApproach` (string): Brief description of current thinking
 - `projectContext` (object): Project context (same structure as thinking_validation)
   - `projectRoot` (string, required)
-  - `filesToAnalyze` or `analysisTargets` (optional)
+  - `analysisTargets` (array, **REQUIRED**): Files to analyze with read modes
 - `projectBackground` (string): Brief project description
 
 **Optional Parameters:**
@@ -388,7 +391,7 @@ All tools now support **Smart Client Mode** with `analysisTargets` for precision
 }
 ```
 
-**Backward Compatible:** The legacy `filesToAnalyze` parameter still works, falling back to enhanced pre-analysis when `analysisTargets` is not provided.
+**Note:** All tools require `analysisTargets` for file analysis. Provide at least one file with appropriate read mode (`full`, `head`, `tail`, or `range`).
 
 ## Contributing
 

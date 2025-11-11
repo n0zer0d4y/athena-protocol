@@ -242,14 +242,22 @@ export async function readMultipleFilesTool(
   args: ReadMultipleFilesArgs
 ): Promise<ReadMultipleFilesResult> {
   try {
+    // DEBUG: Log what we received
+    console.error("[readMultipleFilesTool] Received args:", JSON.stringify(args, null, 2));
+    console.error("[readMultipleFilesTool] Files count:", args.files?.length || 0);
+    
     // Validate args with Zod schema
     const validated = ReadMultipleFilesArgsSchema.parse(args);
     const { files } = validated;
 
+    console.error("[readMultipleFilesTool] Validated files count:", files.length);
+
     // Read all files concurrently using Promise.all
     const results = await Promise.all(
       files.map(async (fileRequest) => {
+        console.error("[readMultipleFilesTool] Reading file:", fileRequest.path, "mode:", fileRequest.mode, "lines:", fileRequest.lines);
         const result = await readSingleFile(fileRequest);
+        console.error("[readMultipleFilesTool] Read result for", fileRequest.path, "success:", result.success, "content length:", result.content?.length || 0);
         return {
           path: fileRequest.path,
           content: result.content,
@@ -258,11 +266,14 @@ export async function readMultipleFilesTool(
       })
     );
 
+    console.error("[readMultipleFilesTool] Total results:", results.length);
+
     return {
       success: true,
       results,
     };
   } catch (error) {
+    console.error("[readMultipleFilesTool] ERROR:", error);
     return {
       success: false,
       results: [],
