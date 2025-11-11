@@ -393,6 +393,25 @@ All tools now support **Smart Client Mode** with `analysisTargets` for precision
 
 **Note:** All tools require `analysisTargets` for file analysis. Provide at least one file with appropriate read mode (`full`, `head`, `tail`, or `range`).
 
+## ⚠️ Important Notices
+
+### Memory System Status
+
+The **persistent memory system** (`thinking-memory.json`) is currently under review and pending refactoring. While functional, it:
+
+- Creates a memory file in the project root directory
+- Persists validation history across sessions
+- May require manual cleanup during testing/development
+
+**Planned improvements:**
+
+- Move storage to `.gitignore`'d directory (e.g. `athena-memory/`)
+- Add automatic cleanup mechanisms
+- Enhanced session management
+- Improved file path handling
+
+For production use, consider this feature as **experimental** until the refactor is complete.
+
 ## Contributing
 
 This server is designed specifically for LLM coding agents. Contributions should focus on:
