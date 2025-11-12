@@ -444,6 +444,23 @@ The **persistent memory system** (`thinking-memory.json`) is currently under rev
 
 For production use, consider this feature as **experimental** until the refactor is complete.
 
+### Provider Testing Status
+
+While Athena Protocol supports 14 LLM providers, **only the following have been thoroughly tested:**
+
+- OpenAI
+- Google
+- ZAI
+- Mistral
+- OpenRouter
+- Groq
+
+**Other providers** (Anthropic, Qwen, XAI, Perplexity, Ollama, Azure, Bedrock, Vertex) are configured and should work, but have not been extensively tested. If you encounter issues with any provider, please [open an issue](https://github.com/n0zer0d4y/athena-protocol/issues) with:
+
+- Provider name and model
+- Error messages or unexpected behavior
+- Your `.env` configuration (redact API keys)
+
 ## Contributing
 
 This server is designed specifically for LLM coding agents. Contributions should focus on:
