@@ -1,3 +1,5 @@
+[![MseeP.ai Security Assessment Badge](https://mseep.net/pr/n0zer0d4y-athena-protocol-badge.png)](https://mseep.ai/app/n0zer0d4y-athena-protocol)
+
 # Athena Protocol MCP Server: A Precursor to **_Context Orchestration_**
 
 ![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?logo=typescript&logoColor=white)
