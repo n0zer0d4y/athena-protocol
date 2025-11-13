@@ -1,4 +1,4 @@
-# Athena Protocol MCP Server
+# Athena Protocol MCP Server: A Precursor to **_Context Orchestration_**
 
 ![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?logo=typescript&logoColor=white)
 ![MCP Dev](https://badge.mcpx.dev?type=dev "MCP Dev")
