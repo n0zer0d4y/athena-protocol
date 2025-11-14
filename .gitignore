@@ -387,4 +387,8 @@ test
 prompt
 server.log
 
+# MCP Registry Authentication
+.mcpregistry_github_token
+.mcpregistry_registry_token
+
 # --- End of .gitignore ---

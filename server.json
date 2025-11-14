@@ -1,0 +1,20 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-10-17/server.schema.json",
+  "name": "io.github.n0zer0d4y/athena-protocol",
+  "description": "AI tech lead for coding agents with validation and impact analysis",
+  "repository": {
+    "url": "https://github.com/n0zer0d4y/athena-protocol",
+    "source": "github"
+  },
+  "version": "0.1.0",
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "@n0zer0d4y/athena-protocol",
+      "version": "0.1.0",
+      "transport": {
+        "type": "stdio"
+      }
+    }
+  ]
+}

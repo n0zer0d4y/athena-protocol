@@ -1,15 +1,21 @@
-# Athena Protocol MCP Server: A Precursor to **_Context Orchestration_**
+# Athena Protocol MCP Server: A Precursor to **_Context Orchestration Protocol_**
 
 ![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?logo=typescript&logoColor=white)
+[![MCP Registry](https://img.shields.io/badge/MCP-Registry-blue)](https://registry.modelcontextprotocol.io/?search=io.github.n0zer0d4y/athena-protocol)
 ![MCP Dev](https://badge.mcpx.dev?type=dev "MCP Dev")
 ![MCP Server](https://badge.mcpx.dev?type=server "MCP Server")
 ![MCP server with features'](https://badge.mcpx.dev?type=server&features=tools "MCP server with features")
 [![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg?style=flat-square)](https://github.com/RichardLitt/standard-readme)
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
+[![MseeP.ai Security Assessment Badge](https://mseep.net/pr/n0zer0d4y-athena-protocol-badge.png)](https://mseep.ai/app/n0zer0d4y-athena-protocol)
 
 An intelligent MCP server that acts as an AI tech lead for coding agents—providing expert validation, impact analysis, and strategic guidance before code changes are made. Like a senior engineer reviewing your approach, Athena Protocol helps AI agents catch critical issues early, validate assumptions against the actual codebase, and optimize their problem-solving strategies. The result: higher quality code, fewer regressions, and more thoughtful architectural decisions.
 
-**Key Feature:** Precision file analysis with `analysisTargets` - achieve 70-85% token reduction and 3-4× faster performance with precision-targeted code analysis. See [Enhanced File Analysis](#enhanced-file-analysis-new) for details.
+**Key Feature:** Precision file analysis with `analysisTargets` - achieve 70-85% token reduction and 3-4× faster performance with precision-targeted code analysis. See [Enhanced File Analysis](#enhanced-file-analysis-new) for details
+
+### 🎯 Context Orchestration Protocol: The Future of AI-Assisted Development
+
+_Imagine LLMs working with context so refined and targeted that they eliminate guesswork, reduce errors by 80%, and deliver code with the precision of seasoned architects—transforming how AI agents understand and enhance complex codebases._
 
 ## Table of Contents
 

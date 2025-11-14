@@ -9,6 +9,10 @@
     "type": "git",
     "url": "git+https://github.com/n0zer0d4y/athena-protocol.git"
   },
+  "mcpName": "io.github.n0zer0d4y/athena-protocol",
+  "publishConfig": {
+    "access": "public"
+  },
   "bugs": {
     "url": "https://github.com/n0zer0d4y/athena-protocol/issues"
   },

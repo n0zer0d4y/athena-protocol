@@ -56,3 +56,7 @@ Thumbs.db
 *.bak
 *~
 
+# MCP Registry Authentication
+.mcpregistry_github_token
+.mcpregistry_registry_token
+
