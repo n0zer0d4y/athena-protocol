@@ -1,6 +1,6 @@
 {
   "name": "@n0zer0d4y/athena-protocol",
-  "version": "0.1.0",
+  "version": "0.1.4",
   "description": "An intelligent MCP server that acts as an AI tech lead for coding agents—providing expert validation, impact analysis, and strategic guidance before code changes are made",
   "license": "MIT",
   "author": "Lloyd Barcatan",

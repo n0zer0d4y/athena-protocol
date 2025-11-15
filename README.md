@@ -141,6 +141,7 @@ See the [detailed provider guide](./docs/PROVIDER_GUIDE.md) for complete setup i
 
 Add this configuration to your MCP client settings file (e.g., `~/.cursor/mcp.json` or Claude Desktop's config):
 
+#### For Local Installation (with .env file)
 ```json
 {
   "mcpServers": {
@@ -154,19 +155,69 @@ Add this configuration to your MCP client settings file (e.g., `~/.cursor/mcp.js
 }
 ```
 
+#### For NPM Installation (with MCP environment variables - RECOMMENDED)
+```json
+{
+  "mcpServers": {
+    "athena-protocol": {
+      "command": "npx",
+      "args": ["@n0zer0d4y/athena-protocol"],
+      "env": {
+        "DEFAULT_LLM_PROVIDER": "openai",
+        "PROVIDER_SELECTION_PRIORITY": "openai,google,anthropic",
+        "OPENAI_API_KEY": "your-openai-api-key-here",
+        "ANTHROPIC_API_KEY": "your-anthropic-api-key-here",
+        "GOOGLE_API_KEY": "your-google-api-key-here"
+      },
+      "type": "stdio",
+      "timeout": 300
+    }
+  }
+}
+```
+
+#### Multi-Provider Enterprise Configuration
+```json
+{
+  "mcpServers": {
+    "athena-protocol": {
+      "command": "npx",
+      "args": ["@n0zer0d4y/athena-protocol"],
+      "env": {
+        "DEFAULT_LLM_PROVIDER": "anthropic",
+        "PROVIDER_SELECTION_PRIORITY": "anthropic,openai,google,groq",
+        "ANTHROPIC_API_KEY": "sk-ant-...",
+        "OPENAI_API_KEY": "sk-...",
+        "GOOGLE_API_KEY": "...",
+        "GROQ_API_KEY": "...",
+        "ANTHROPIC_MODEL": "claude-3-5-sonnet-20241022",
+        "OPENAI_MODEL": "gpt-4o",
+        "LLM_TEMPERATURE": "0.7",
+        "LLM_MAX_TOKENS": "2000"
+      },
+      "type": "stdio",
+      "timeout": 300
+    }
+  }
+}
+```
+
 **Configuration Notes:**
 
-- Replace `/absolute/path/to/athena-protocol/` with your actual installation path
-- `timeout`: Set to 300 (5 minutes) for reasoning models; reduce to 60-120 for faster models
-- Ensure the server is built (`npm run build`) before starting your MCP client
+- **NPM Installation**: Use `npx @n0zer0d4y/athena-protocol` with the `env` field for easiest setup
+- **Local Installation**: Use absolute path to `dist/index.js` if you have a local installation with `.env`
+- **Environment Priority**: MCP `env` variables take precedence over `.env` file variables
+- **Timeout**: Set to 300 (5 minutes) for reasoning models; reduce to 60-120 for faster models
+- **Security**: Never commit API keys to version control - use MCP client environment variables instead
 
 ### Server Modes
 
 #### MCP Server Mode (for production use)
 
 ```bash
-npm start                    # Start MCP server for client integration
+npm start                    # Start MCP server for client integration (requires .env or MCP env)
 npm run dev                  # Development mode with auto-restart
+npx @n0zer0d4y/athena-protocol  # Run published version via npx (requires MCP env)
 ```
 
 #### Standalone Mode (for testing)
@@ -450,6 +501,16 @@ The **persistent memory system** (`thinking-memory.json`) is currently under rev
 
 For production use, consider this feature as **experimental** until the refactor is complete.
 
+### Configuration Methods
+
+Athena Protocol supports two configuration methods with clear priority ordering:
+
+1. **MCP Client Environment Variables** (highest priority - recommended for npm installations)
+2. **Local .env File** (fallback - for local development)
+3. **System Environment Variables** (lowest priority)
+
+For npm-published usage, configure all settings directly in your MCP client's `env` field. For local development, continue using `.env` files.
+
 ### Provider Testing Status
 
 While Athena Protocol supports 14 LLM providers, **only the following have been thoroughly tested:**
@@ -465,7 +526,7 @@ While Athena Protocol supports 14 LLM providers, **only the following have been 
 
 - Provider name and model
 - Error messages or unexpected behavior
-- Your `.env` configuration (redact API keys)
+- Your MCP configuration or `.env` configuration (redact API keys)
 
 ## Contributing
 

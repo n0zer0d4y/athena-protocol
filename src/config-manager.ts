@@ -5,6 +5,10 @@ import {
   PROVIDER_API_KEYS,
   providerSupportsFeature,
 } from "./ai-providers/index.js";
+import {
+  EnvironmentProvider,
+  ProcessEnvProvider,
+} from "./utils/env-provider.js";
 
 // ==========================================
 // INTERFACES (moved from llm-config.ts)
@@ -221,8 +225,28 @@ class EnvironmentCache {
   }
 }
 
+// Global environment provider - supports dependency injection
+let globalEnvProvider: EnvironmentProvider = new ProcessEnvProvider();
+
 // Global cache instance - maintains backward compatibility
 const envCache = new EnvironmentCache({ defaultTTL: 30000 }); // 30 seconds
+
+/**
+ * Set the global environment provider for dependency injection
+ * Allows MCP servers to inject environment variables from client config
+ */
+export function setEnvironmentProvider(provider: EnvironmentProvider): void {
+  globalEnvProvider = provider;
+  // Clear cache when provider changes to ensure fresh values
+  envCache.invalidate("*");
+}
+
+/**
+ * Get the current global environment provider
+ */
+export function getEnvironmentProvider(): EnvironmentProvider {
+  return globalEnvProvider;
+}
 
 // ==========================================
 // ERROR HANDLING SYSTEM
@@ -473,8 +497,8 @@ function resolveEnvVariableCached(key: string): string | undefined {
     return cached;
   }
 
-  // Get fresh value and cache it
-  const value = process.env[key];
+  // Get fresh value from environment provider and cache it
+  const value = globalEnvProvider.get(key);
   envCache.set(cacheKey, value);
   return value;
 }
@@ -918,12 +942,29 @@ class UnifiedConfigManager {
 
   /**
    * Check if unified config is enabled (feature flag)
+   * Defaults to enabled for MCP usage (when running via npx or has MCP env vars)
    */
   private isEnabled(): boolean {
-    return (
-      process.env[this.featureFlag] === "1" ||
-      process.env[this.featureFlag] === "true"
+    const envValue = globalEnvProvider.get(this.featureFlag);
+    if (envValue === "1" || envValue === "true") return true;
+    if (envValue === "0" || envValue === "false") return false;
+
+    // Default to enabled for MCP usage (detect via env vars)
+    const hasMCPEnvVars = Object.keys(process.env).some(
+      (key) =>
+        key.startsWith("DEFAULT_LLM_PROVIDER") ||
+        key.startsWith("PROVIDER_SELECTION_PRIORITY") ||
+        key.includes("API_KEY") ||
+        key.includes("_MODEL")
     );
+    const scriptPath = process.argv[1] || "";
+    const isNPX =
+      scriptPath.includes("_npx") ||
+      scriptPath.includes(".npm") ||
+      process.cwd().includes("_npx") ||
+      process.cwd().includes(".npm");
+
+    return isNPX || hasMCPEnvVars; // Enable by default for MCP usage
   }
 
   /**
@@ -1077,7 +1118,9 @@ class UnifiedConfigManager {
    * Get unified configuration for a provider
    */
   getProviderConfiguration(providerName: string): ProviderConfiguration | null {
-    console.error(`[DEBUG] getProviderConfiguration called for ${providerName}`);
+    console.error(
+      `[DEBUG] getProviderConfiguration called for ${providerName}`
+    );
     console.error(`[DEBUG] isEnabled(): ${this.isEnabled()}`);
 
     if (!this.isEnabled()) {
@@ -1489,10 +1532,10 @@ const PROVIDER_VALIDATION_RULES: Record<string, ConfigurationValidationRule[]> =
 const GLOBAL_VALIDATION_RULES: ConfigurationValidationRule[] = [
   {
     field: "PROVIDER_SELECTION_PRIORITY",
-    required: true,
+    required: false, // Made optional - system can auto-generate from configured providers
     type: "string",
     validator: (value) => {
-      if (!value || typeof value !== "string") return false;
+      if (!value || typeof value !== "string") return true; // Optional field
       const providers = value
         .split(",")
         .map((p) => p.trim())
@@ -1729,15 +1772,43 @@ export class ConfigurationValidator {
 
   /**
    * Comprehensive system validation
+   * For MCP usage, be more lenient with warnings about unconfigured providers
    */
   static validateSystem(): ValidationResult {
     const globalValidation = this.validateGlobalConfig();
     const providerValidation = this.validateAllProviders();
 
+    // Check if we're in MCP mode (has MCP env vars or running via npx)
+    const hasMCPEnvVars = Object.keys(process.env).some(
+      (key) =>
+        key.startsWith("DEFAULT_LLM_PROVIDER") ||
+        key.startsWith("PROVIDER_SELECTION_PRIORITY") ||
+        key.includes("API_KEY") ||
+        key.includes("_MODEL")
+    );
+
+    // Check if running via npx by examining the script path
+    const scriptPath = process.argv[1] || "";
+    const isNPX =
+      scriptPath.includes("_npx") ||
+      scriptPath.includes(".npm") ||
+      process.cwd().includes("_npx") ||
+      process.cwd().includes(".npm");
+    const isMCPMode = hasMCPEnvVars || isNPX;
+
+    // For MCP mode, filter out warnings about missing API keys for unconfigured providers
+    // These are expected and shouldn't cause validation failure
+    let filteredWarnings = providerValidation.warnings;
+    if (isMCPMode) {
+      filteredWarnings = providerValidation.warnings.filter(
+        (warning) => !warning.message.includes("has no API key configured")
+      );
+    }
+
     return {
       isValid: globalValidation.isValid && providerValidation.isValid,
       errors: [...globalValidation.errors, ...providerValidation.errors],
-      warnings: [...globalValidation.warnings, ...providerValidation.warnings],
+      warnings: [...globalValidation.warnings, ...filteredWarnings],
     };
   }
 
@@ -2117,7 +2188,11 @@ export function printValidationResults(result: LegacyValidationResult): void {
   } else {
     result.issues.forEach((issue, index) => {
       const icon =
-        issue.type === "error" ? "[error]" : issue.type === "warning" ? "[warning]" : "[info]";
+        issue.type === "error"
+          ? "[error]"
+          : issue.type === "warning"
+          ? "[warning]"
+          : "[info]";
       console.error(`${icon} ${issue.message}`);
       if (issue.field) {
         console.error(`   Field: ${issue.field}`);
