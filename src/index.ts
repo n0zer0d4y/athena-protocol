@@ -16,37 +16,98 @@ const __dirname = dirname(__filename);
 // Project root is one level up from the dist directory
 const projectRoot = join(__dirname, "..");
 
-// Simple, predictable .env loading - FAIL FAST on configuration issues
-function loadEnvironmentVariables() {
-  // Primary: Project root (most reliable for MCP usage)
-  const envPath = join(projectRoot, ".env");
-
-  if (!existsSync(envPath)) {
-    throw new Error(
-      `Required .env file not found at: ${envPath}\n` +
-        `Current working directory: ${process.cwd()}\n` +
-        `Project root: ${projectRoot}\n` +
-        `Please ensure .env file exists in the project root directory.`
-    );
-  }
-
-  console.error(`Loading .env from: ${envPath}`);
-  const result = dotenv.config({ path: envPath });
-
-  if (result.error) {
-    throw new Error(`Failed to parse .env file: ${result.error.message}`);
-  }
-
-  console.error(
-    `Successfully loaded .env with ${
-      Object.keys(result.parsed || {}).length
-    } variables`
+/**
+ * Detect if running in MCP server mode with environment variables from client
+ */
+function detectMCPServerMode(): boolean {
+  // Check for indicators of MCP server usage
+  const hasMCPEnvVars = Object.keys(process.env).some(key =>
+    key.startsWith('DEFAULT_LLM_PROVIDER') ||
+    key.startsWith('PROVIDER_SELECTION_PRIORITY') ||
+    key.includes('API_KEY') ||
+    key.includes('_MODEL')
   );
-  return result.parsed || {};
+
+  // Check if running via npx by looking for npm cache paths
+  const isNPX = __filename.includes('_npx') ||
+                __filename.includes('.npm') ||
+                process.cwd().includes('_npx') ||
+                process.cwd().includes('.npm');
+
+  return isNPX || hasMCPEnvVars;
 }
 
-// Load environment variables - fail fast if not found
-const envVars = loadEnvironmentVariables();
+/**
+ * Load environment variables with MCP client support
+ * Supports both .env files (legacy) and MCP client env configuration
+ */
+function initializeEnvironmentProvider(): EnvironmentProvider {
+  const mcpProvider = new ProcessEnvProvider(); // MCP env vars come via process.env
+  const processProvider = new ProcessEnvProvider(); // System env vars
+
+  // Check if running via npx (npm-published usage)
+  const isNPX = __filename.includes('_npx') ||
+                __filename.includes('.npm') ||
+                process.cwd().includes('_npx') ||
+                process.cwd().includes('.npm') ||
+                process.argv.some(arg => arg.includes('npx'));
+  const isNPM = process.argv.some(arg => arg.includes('npm') && !arg.includes('npx'));
+
+  // Debug logging for troubleshooting (only show essential info)
+  if (isNPX) {
+    console.error(`Running via npx - using MCP environment variables only`);
+    console.error(`Configure all settings in your MCP client's env field`);
+  }
+
+  let dotenvProvider = new DotenvProvider();
+
+  if (isNPX) {
+    // For npx usage, completely skip .env loading - rely on MCP env vars only
+    console.error("Running via npx - using MCP environment variables only");
+    console.error("Configure all settings in your MCP client's env field");
+  } else {
+    // For local installations, try to load .env file (optional for backward compatibility)
+    try {
+      const envPath = join(projectRoot, ".env");
+      if (existsSync(envPath)) {
+        console.error(`Loading .env from: ${envPath}`);
+        const result = dotenv.config({ path: envPath });
+
+        if (result.error) {
+          console.warn(`Warning: Failed to parse .env file: ${result.error.message}`);
+          console.warn("Continuing with MCP environment variables only...");
+        } else {
+          dotenvProvider.setVars(result.parsed || {});
+          console.error(
+            `Successfully loaded .env with ${
+              Object.keys(result.parsed || {}).length
+            } variables`
+          );
+        }
+      } else if (!isNPM && !detectMCPServerMode()) {
+        // Only warn about missing .env if not in any special mode
+        console.warn("No .env file found. If you're not using MCP client configuration,");
+        console.warn("please create a .env file in the project root with your API keys.");
+      }
+    } catch (error) {
+      console.warn(`Warning: Error loading .env file: ${(error as Error).message}`);
+      console.warn("Continuing with MCP environment variables only...");
+    }
+  }
+
+  // Create merged provider with priority: MCP env → .env → system env
+  const mergedProvider = new TripleMergedEnvProvider(
+    mcpProvider,     // Highest priority (MCP client env vars)
+    dotenvProvider,  // Middle priority (.env file) - empty for npx
+    processProvider  // Lowest priority (system env)
+  );
+
+  return mergedProvider;
+}
+
+// Initialize environment provider with MCP support
+const envProvider = initializeEnvironmentProvider();
+setEnvironmentProvider(envProvider);
 
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
@@ -60,6 +121,7 @@ import {
   loadConfig,
   loadToolCallingConfig,
   validateToolCallingConfig,
+  setEnvironmentProvider,
 } from "./config-manager.js";
 import { ThinkingValidator } from "./core/thinking-validator.js";
 import { HEALTH_CHECK_TOOL } from "./client-tools/simple-health-check.js";
@@ -70,6 +132,12 @@ import {
   printValidationResults,
 } from "./config-manager.js";
 import { SUPPORTED_PROVIDERS } from "./ai-providers/index.js";
+import {
+  EnvironmentProvider,
+  ProcessEnvProvider,
+  DotenvProvider,
+  TripleMergedEnvProvider
+} from "./utils/env-provider.js";
 
 /**
  * Safely get the default provider description suffix for tool schemas
@@ -1010,8 +1078,12 @@ const SESSION_MANAGEMENT_TOOL: Tool = {
 // COMPREHENSIVE_VALIDATION_TOOL removed - functionality consolidated into health_check tool
 
 async function main() {
+  console.error("Initializing Athena Protocol MCP Server...");
+
+  // Load and validate configuration
+  console.error("Loading configuration...");
   const config = loadConfig();
-  console.error("Loaded config:", JSON.stringify(config, null, 2));
+  console.error("Loaded config with providers:", config.providers.map(p => p.name));
 
   // Validate configuration
   console.error("Validating configuration...");
@@ -1022,9 +1094,18 @@ async function main() {
     console.error(
       "Configuration validation failed. Please fix the issues above."
     );
-    console.error(
-      "Tip: Check your .env file and ensure all required environment variables are set."
-    );
+    if (detectMCPServerMode()) {
+      console.error(
+        "Tip: Check your MCP client configuration (mcp.json) and ensure all required environment variables are set in the 'env' field."
+      );
+      console.error(
+        "Example MCP configuration: https://github.com/n0zer0d4y/athena-protocol#usage"
+      );
+    } else {
+      console.error(
+        "Tip: Check your .env file and ensure all required environment variables are set."
+      );
+    }
     process.exit(1);
   }
 
