@@ -114,11 +114,11 @@ The Athena Protocol supports 14 LLM providers. While OpenAI is commonly used, yo
 - Perplexity - Search-augmented models
 - XAI - Grok models
 - Qwen - Alibaba's high-performance LLMs
+- ZAI - GLM models
 
 **Local/Self-Hosted:**
 
 - Ollama - Run models locally
-- ZAI - Custom deployments
 
 Quick switch example:
 
@@ -139,9 +139,19 @@ See the [detailed provider guide](./docs/PROVIDER_GUIDE.md) for complete setup i
 
 ### MCP Client Configuration
 
-Add this configuration to your MCP client settings file (e.g., `~/.cursor/mcp.json` or Claude Desktop's config):
+**For detailed, tested MCP client configurations, see [CLIENT_MCP_CONFIGURATION_EXAMPLES.md](docs/CLIENT_MCP_CONFIGURATION_EXAMPLES.md)**
 
 #### For Local Installation (with .env file)
+
+Local installation with `.env` file remains fully functional and unchanged. Simply clone the repository and run:
+
+```bash
+npm install
+npm run build
+```
+
+Then configure your MCP client to point to the local installation:
+
 ```json
 {
   "mcpServers": {
@@ -156,6 +166,11 @@ Add this configuration to your MCP client settings file (e.g., `~/.cursor/mcp.js
 ```
 
 #### For NPM Installation (with MCP environment variables - RECOMMENDED)
+
+For npm/npx usage, configure your MCP client with environment variables. **Only the configurations in [CLIENT_MCP_CONFIGURATION_EXAMPLES.md](docs/CLIENT_MCP_CONFIGURATION_EXAMPLES.md) are tested and guaranteed to work.**
+
+Example for GPT-5:
+
 ```json
 {
   "mcpServers": {
@@ -164,10 +179,14 @@ Add this configuration to your MCP client settings file (e.g., `~/.cursor/mcp.js
       "args": ["@n0zer0d4y/athena-protocol"],
       "env": {
         "DEFAULT_LLM_PROVIDER": "openai",
-        "PROVIDER_SELECTION_PRIORITY": "openai,google,anthropic",
         "OPENAI_API_KEY": "your-openai-api-key-here",
-        "ANTHROPIC_API_KEY": "your-anthropic-api-key-here",
-        "GOOGLE_API_KEY": "your-google-api-key-here"
+        "OPENAI_MODEL_DEFAULT": "gpt-5",
+        "OPENAI_MAX_COMPLETION_TOKENS_DEFAULT": "8192",
+        "OPENAI_VERBOSITY_DEFAULT": "medium",
+        "OPENAI_REASONING_EFFORT_DEFAULT": "high",
+        "LLM_TEMPERATURE_DEFAULT": "0.7",
+        "LLM_MAX_TOKENS_DEFAULT": "2000",
+        "LLM_TIMEOUT_DEFAULT": "30000"
       },
       "type": "stdio",
       "timeout": 300
@@ -176,39 +195,38 @@ Add this configuration to your MCP client settings file (e.g., `~/.cursor/mcp.js
 }
 ```
 
-#### Multi-Provider Enterprise Configuration
-```json
-{
-  "mcpServers": {
-    "athena-protocol": {
-      "command": "npx",
-      "args": ["@n0zer0d4y/athena-protocol"],
-      "env": {
-        "DEFAULT_LLM_PROVIDER": "anthropic",
-        "PROVIDER_SELECTION_PRIORITY": "anthropic,openai,google,groq",
-        "ANTHROPIC_API_KEY": "sk-ant-...",
-        "OPENAI_API_KEY": "sk-...",
-        "GOOGLE_API_KEY": "...",
-        "GROQ_API_KEY": "...",
-        "ANTHROPIC_MODEL": "claude-3-5-sonnet-20241022",
-        "OPENAI_MODEL": "gpt-4o",
-        "LLM_TEMPERATURE": "0.7",
-        "LLM_MAX_TOKENS": "2000"
-      },
-      "type": "stdio",
-      "timeout": 300
-    }
-  }
-}
-```
+**See [CLIENT_MCP_CONFIGURATION_EXAMPLES.md](docs/CLIENT_MCP_CONFIGURATION_EXAMPLES.md) for complete working configurations.**
 
 **Configuration Notes:**
 
 - **NPM Installation**: Use `npx @n0zer0d4y/athena-protocol` with the `env` field for easiest setup
-- **Local Installation**: Use absolute path to `dist/index.js` if you have a local installation with `.env`
+- **Local Installation**: Local `.env` file execution remains fully functional and unchanged
 - **Environment Priority**: MCP `env` variables take precedence over `.env` file variables
-- **Timeout**: Set to 300 (5 minutes) for reasoning models; reduce to 60-120 for faster models
+- **GPT-5 Support**: Includes specific parameters for GPT-5 models
+- **Timeout Configuration**: The default timeout of 300 seconds (5 minutes) is set for reasoning models like GPT-5. For faster LLMs (GPT-4, Claude, Gemini), you can reduce this to 60-120 seconds
+- **GPT-5 Parameter Notes**: The parameters `LLM_TEMPERATURE_DEFAULT`, `LLM_MAX_TOKENS_DEFAULT`, and `LLM_TIMEOUT_DEFAULT` are currently required for GPT-5 models but are not used by the model itself. This is a temporary limitation that will be addressed in a future refactoring
 - **Security**: Never commit API keys to version control - use MCP client environment variables instead
+
+### Future Refactoring Plans
+
+#### GPT-5 Parameter Optimization
+
+**Current Issue**: GPT-5 models currently require the standard LLM parameters (`LLM_TEMPERATURE_DEFAULT`, `LLM_MAX_TOKENS_DEFAULT`, `LLM_TIMEOUT_DEFAULT`) even though these parameters are not used by the model.
+
+**Planned Solution**:
+
+1. **Modify `getTemperature()` function** to return `undefined` for GPT-5+ models instead of a hardcoded default
+2. **Update AI provider interfaces** to handle `undefined` temperature values
+3. **Implement conditional parameter validation** that skips standard parameters for GPT-5+ models
+4. **Update OpenAI provider** to omit unused parameters when communicating with GPT-5 API
+
+**Benefits**:
+
+- Cleaner configuration for GPT-5 users
+- More accurate representation of model capabilities
+- Better adherence to OpenAI's GPT-5 API specification
+
+**Timeline**: Target implementation in v0.3.0
 
 ### Server Modes
 
