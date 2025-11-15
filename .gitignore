@@ -391,4 +391,7 @@ server.log
 .mcpregistry_github_token
 .mcpregistry_registry_token
 
+# --- Athena Protocol local memory ---
+thinking-memory.json
+
 # --- End of .gitignore ---
