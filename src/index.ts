@@ -21,18 +21,20 @@ const projectRoot = join(__dirname, "..");
  */
 function detectMCPServerMode(): boolean {
   // Check for indicators of MCP server usage
-  const hasMCPEnvVars = Object.keys(process.env).some(key =>
-    key.startsWith('DEFAULT_LLM_PROVIDER') ||
-    key.startsWith('PROVIDER_SELECTION_PRIORITY') ||
-    key.includes('API_KEY') ||
-    key.includes('_MODEL')
+  const hasMCPEnvVars = Object.keys(process.env).some(
+    (key) =>
+      key.startsWith("DEFAULT_LLM_PROVIDER") ||
+      key.startsWith("PROVIDER_SELECTION_PRIORITY") ||
+      key.includes("API_KEY") ||
+      key.includes("_MODEL")
   );
 
   // Check if running via npx by looking for npm cache paths
-  const isNPX = __filename.includes('_npx') ||
-                __filename.includes('.npm') ||
-                process.cwd().includes('_npx') ||
-                process.cwd().includes('.npm');
+  const isNPX =
+    __filename.includes("_npx") ||
+    __filename.includes(".npm") ||
+    process.cwd().includes("_npx") ||
+    process.cwd().includes(".npm");
 
   return isNPX || hasMCPEnvVars;
 }
@@ -46,12 +48,15 @@ function initializeEnvironmentProvider(): EnvironmentProvider {
   const processProvider = new ProcessEnvProvider(); // System env vars
 
   // Check if running via npx (npm-published usage)
-  const isNPX = __filename.includes('_npx') ||
-                __filename.includes('.npm') ||
-                process.cwd().includes('_npx') ||
-                process.cwd().includes('.npm') ||
-                process.argv.some(arg => arg.includes('npx'));
-  const isNPM = process.argv.some(arg => arg.includes('npm') && !arg.includes('npx'));
+  const isNPX =
+    __filename.includes("_npx") ||
+    __filename.includes(".npm") ||
+    process.cwd().includes("_npx") ||
+    process.cwd().includes(".npm") ||
+    process.argv.some((arg) => arg.includes("npx"));
+  const isNPM = process.argv.some(
+    (arg) => arg.includes("npm") && !arg.includes("npx")
+  );
 
   // Debug logging for troubleshooting (only show essential info)
   if (isNPX) {
@@ -74,7 +79,9 @@ function initializeEnvironmentProvider(): EnvironmentProvider {
         const result = dotenv.config({ path: envPath });
 
         if (result.error) {
-          console.warn(`Warning: Failed to parse .env file: ${result.error.message}`);
+          console.warn(
+            `Warning: Failed to parse .env file: ${result.error.message}`
+          );
           console.warn("Continuing with MCP environment variables only...");
         } else {
           dotenvProvider.setVars(result.parsed || {});
@@ -86,20 +93,26 @@ function initializeEnvironmentProvider(): EnvironmentProvider {
         }
       } else if (!isNPM && !detectMCPServerMode()) {
         // Only warn about missing .env if not in any special mode
-        console.warn("No .env file found. If you're not using MCP client configuration,");
-        console.warn("please create a .env file in the project root with your API keys.");
+        console.warn(
+          "No .env file found. If you're not using MCP client configuration,"
+        );
+        console.warn(
+          "please create a .env file in the project root with your API keys."
+        );
       }
     } catch (error) {
-      console.warn(`Warning: Error loading .env file: ${(error as Error).message}`);
+      console.warn(
+        `Warning: Error loading .env file: ${(error as Error).message}`
+      );
       console.warn("Continuing with MCP environment variables only...");
     }
   }
 
   // Create merged provider with priority: MCP env → .env → system env
   const mergedProvider = new TripleMergedEnvProvider(
-    mcpProvider,     // Highest priority (MCP client env vars)
-    dotenvProvider,  // Middle priority (.env file) - empty for npx
-    processProvider  // Lowest priority (system env)
+    mcpProvider, // Highest priority (MCP client env vars)
+    dotenvProvider, // Middle priority (.env file) - empty for npx
+    processProvider // Lowest priority (system env)
   );
 
   return mergedProvider;
@@ -136,7 +149,7 @@ import {
   EnvironmentProvider,
   ProcessEnvProvider,
   DotenvProvider,
-  TripleMergedEnvProvider
+  TripleMergedEnvProvider,
 } from "./utils/env-provider.js";
 
 /**
@@ -258,7 +271,8 @@ const THINKING_VALIDATION_TOOL: Tool = {
                 mode: {
                   type: "string",
                   enum: ["full", "head", "tail", "range"],
-                  description: "'full'=when issue area unclear, 'head'=imports/setup, 'tail'=recent changes, 'range'=known lines",
+                  description:
+                    "'full'=when issue area unclear, 'head'=imports/setup, 'tail'=recent changes, 'range'=known lines",
                 },
                 lines: {
                   type: "number",
@@ -384,7 +398,8 @@ const IMPACT_ANALYSIS_TOOL: Tool = {
                 mode: {
                   type: "string",
                   enum: ["full", "head", "tail", "range"],
-                  description: "'full'=when issue area unclear, 'head'=imports/setup, 'tail'=recent changes, 'range'=known lines",
+                  description:
+                    "'full'=when issue area unclear, 'head'=imports/setup, 'tail'=recent changes, 'range'=known lines",
                 },
                 lines: {
                   type: "number",
@@ -488,7 +503,8 @@ const ASSUMPTION_CHECKER_TOOL: Tool = {
                 mode: {
                   type: "string",
                   enum: ["full", "head", "tail", "range"],
-                  description: "'full'=when issue area unclear, 'head'=imports/setup, 'tail'=recent changes, 'range'=known lines",
+                  description:
+                    "'full'=when issue area unclear, 'head'=imports/setup, 'tail'=recent changes, 'range'=known lines",
                 },
                 lines: {
                   type: "number",
@@ -593,7 +609,8 @@ const DEPENDENCY_MAPPER_TOOL: Tool = {
                 mode: {
                   type: "string",
                   enum: ["full", "head", "tail", "range"],
-                  description: "'full'=when issue area unclear, 'head'=imports/setup, 'tail'=recent changes, 'range'=known lines",
+                  description:
+                    "'full'=when issue area unclear, 'head'=imports/setup, 'tail'=recent changes, 'range'=known lines",
                 },
                 lines: {
                   type: "number",
@@ -696,7 +713,8 @@ const THINKING_OPTIMIZER_TOOL: Tool = {
                 mode: {
                   type: "string",
                   enum: ["full", "head", "tail", "range"],
-                  description: "'full'=when issue area unclear, 'head'=imports/setup, 'tail'=recent changes, 'range'=known lines",
+                  description:
+                    "'full'=when issue area unclear, 'head'=imports/setup, 'tail'=recent changes, 'range'=known lines",
                 },
                 lines: {
                   type: "number",
@@ -1083,7 +1101,10 @@ async function main() {
   // Load and validate configuration
   console.error("Loading configuration...");
   const config = loadConfig();
-  console.error("Loaded config with providers:", config.providers.map(p => p.name));
+  console.error(
+    "Loaded config with providers:",
+    config.providers.map((p) => p.name)
+  );
 
   // Validate configuration
   console.error("Validating configuration...");
@@ -1172,7 +1193,7 @@ async function main() {
   const server = new Server(
     {
       name: "athena-protocol",
-      version: "0.1.0",
+      version: "0.2.0",
     },
     {
       capabilities: {
@@ -1191,7 +1212,7 @@ async function main() {
       },
       serverInfo: {
         name: "athena-protocol",
-        version: "0.1.0",
+        version: "0.2.0",
       },
     };
   });
