@@ -54,7 +54,7 @@
     "@ai-sdk/mistral": "^2.0.14",
     "@ai-sdk/openai": "^2.0.29",
     "@ai-sdk/perplexity": "^2.0.9",
-    "@ai-sdk/xai": "^2.0.18",
+    "@ai-sdk/xai": "^2.0.30",
     "@aws-sdk/credential-providers": "^3.888.0",
     "@modelcontextprotocol/sdk": "^1.18.0",
     "@openrouter/ai-sdk-provider": "^1.2.0",
