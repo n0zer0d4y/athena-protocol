@@ -45,7 +45,7 @@
     "validate-config": "node validate-config.js"
   },
   "dependencies": {
-    "@ai-sdk/amazon-bedrock": "^3.0.48",
+    "@ai-sdk/amazon-bedrock": "^3.0.65",
     "@ai-sdk/anthropic": "^2.0.40",
     "@ai-sdk/azure": "^2.0.57",
     "@ai-sdk/google": "^2.0.43",
